@@ -20,7 +20,7 @@ public:
         sprite.setPosition(startX, startY);
         
         // Cambiar el tamaño de la bala: 0.3 significa reducir su tamaño al 30%
-        sprite.setScale(0.1f, 0.1f);  // Cambiar los factores de escala según prefieras
+        sprite.setScale(0.05f, 0.05f);  // Cambiar los factores de escala según prefieras
         ////std::cout << "Bullet Size: " << sprite.getGlobalBounds().width << " x " << sprite.getGlobalBounds().height << std::endl;
 
         // Normalizar la dirección y multiplicar por la velocidad

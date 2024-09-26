@@ -13,7 +13,7 @@ private:
 
 public:
     // Constructor
-    Game() : window(sf::VideoMode(1600, 1240), "Tanks Multiplayer"), player1("tank1.png", 1, 1), player2("tank2.png", 1920, 1080) {
+    Game() : window(sf::VideoMode(1500, 1100), "Tanks Multiplayer"), player1("tank1.png", 1, 1), player2("tank2.png", 1200, 800) {
         if (!bulletTexture.loadFromFile("Bullet.png")) {
             // Handle error
         }
@@ -47,10 +47,11 @@ private:
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             player1.move(-1,0);
-            player1.rotate();  // Izquierda
+            player1.inRotate();  // Izquierda
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            player1.move(1, 0);   // Derecha
+            player1.move(1, 0);  
+            player1.rotate(); // Derecha
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
             shootBullet(player1);
@@ -65,10 +66,11 @@ private:
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             player2.move(-1, 0);
-            player2.rotate();  // Izquierda
+            player2.inRotate();  // Izquierda
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             player2.move(1, 0);   // Derecha
+            player2.rotate();   
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
             shootBullet(player2);
