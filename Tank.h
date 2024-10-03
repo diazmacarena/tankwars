@@ -32,17 +32,11 @@ public:
 }
 
 
-    void rotate() {
-        float rotacion = 1;
-        float rotacionverdadera = rotacion/5;
-        
-        sprite.rotate(rotacionverdadera);
+    // Rotación
+    void rotate(float angle) {
+        sprite.rotate(angle); 
     }
-    void inRotate(){
-        float rotacion = 1;
-        float rotacionverdadera = rotacion/-5;
-        sprite.rotate(rotacionverdadera);
-    }
+    
     // Movimiento
     void move(float offsetX, float offsetY) {
         sprite.move(offsetX * speed, offsetY * speed);

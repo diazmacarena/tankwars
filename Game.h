@@ -2,6 +2,7 @@
 #include "Tank.h"
 #include "Bullet.h"
 #include <vector>
+#include <cmath>
 
 class Game {
 private:
@@ -10,10 +11,14 @@ private:
     Tank player2;
     std::vector<Bullet> bullets;
     sf::Texture bulletTexture;
+    const float movementSpeed = 1.0f;  // Velocidad de movimiento
+    const float rotationSpeed = 0.3f;  // Velocidad de rotación
 
 public:
     // Constructor
-    Game() : window(sf::VideoMode(1500, 1100), "Tanks Multiplayer"), player1("tank1.png", 1, 1), player2("tank2.png", 1200, 800) {
+    Game() : window(sf::VideoMode(1500, 1100), "Tanks Multiplayer"), 
+             player1("tank1.png", 700, 300), 
+             player2("tank2.png", 600, 200) {
         if (!bulletTexture.loadFromFile("Bullet.png")) {
             // Handle error
         }
@@ -29,6 +34,11 @@ public:
     }
 
 private:
+    // Función auxiliar para convertir grados a radianes
+    float degreesToRadians(float degrees) {
+        return degrees * (3.14159265359f / 180.0f);
+    }
+
     // Procesar los eventos (teclas, cierre de ventana, etc.)
     void processEvents() {
         sf::Event event;
@@ -40,37 +50,45 @@ private:
         
         // Controles de jugador 1
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-            player1.move(0, -1);  // Arriba
+            float angleRadians = degreesToRadians(player1.sprite.getRotation());
+            float dx = std::cos(angleRadians) * movementSpeed;
+            float dy = std::sin(angleRadians) * movementSpeed;
+            player1.move(dx, dy);  // Mueve el tanque hacia adelante
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            player1.move(0, 1);   // Abajo
+            float angleRadians = degreesToRadians(player1.sprite.getRotation());
+            float dx = std::cos(angleRadians) * -movementSpeed;
+            float dy = std::sin(angleRadians) * -movementSpeed;
+            player1.move(dx, dy);  // Mueve el tanque hacia atrás
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            player1.move(-1,0);
-            player1.inRotate();  // Izquierda
+            player1.rotate(-rotationSpeed);  // Rotación hacia la izquierda
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            player1.move(1, 0);  
-            player1.rotate(); // Derecha
+            player1.rotate(rotationSpeed);   // Rotación hacia la derecha
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
             shootBullet(player1);
         }
-
+        
         // Controles de jugador 2
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            player2.move(0, -1);  // Arriba
+            float angleRadians = degreesToRadians(player2.sprite.getRotation());
+            float dx = std::cos(angleRadians) * movementSpeed;
+            float dy = std::sin(angleRadians) * movementSpeed;
+            player2.move(dx, dy);  // Mueve el tanque hacia adelante
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            player2.move(0, 1);   // Abajo
+            float angleRadians = degreesToRadians(player2.sprite.getRotation());
+            float dx = std::cos(angleRadians) * -movementSpeed;
+            float dy = std::sin(angleRadians) * -movementSpeed;
+            player2.move(dx, dy);  // Mueve el tanque hacia atrás
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            player2.move(-1, 0);
-            player2.inRotate();  // Izquierda
+            player2.rotate(-rotationSpeed);  // Rotación hacia la izquierda
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            player2.move(1, 0);   // Derecha
-            player2.rotate();   
+            player2.rotate(rotationSpeed);   // Rotación hacia la derecha
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
             shootBullet(player2);
@@ -109,7 +127,6 @@ private:
         if (direction.x == 0 && direction.y == 0) {
             direction.x = 1;  // Disparo por defecto
         }
-        bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction);
-        
+        bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, player);
     }
 };
