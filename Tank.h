@@ -12,6 +12,9 @@ public:
     // Constructor
     // Constructor de la clase Tank
     Tank(const std::string& textureFile, float initialX, float initialY) {
+        if (!texture.loadFromFile(textureFile)) {
+        std::cerr << "Error: No se pudo cargar la textura " << textureFile << std::endl;
+    }
 
         sprite.setTexture(texture);
 

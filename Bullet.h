@@ -11,7 +11,9 @@ public:
 
     // Constructor de la clase Bullet
     Bullet(const std::string& textureFile, float startX, float startY, sf::Vector2f direction, Tank &player) {
-    
+        if (!texture.loadFromFile(textureFile)) {
+        std::cerr << "Error: No se pudo cargar la textura de la bala " << textureFile << std::endl;
+    }
         sprite.setTexture(texture);
         
         sprite.setScale(0.05f, 0.05f);  // Cambiar los factores de escala
