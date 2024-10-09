@@ -21,8 +21,8 @@ public:
         // Calcular la posición de la bala delante del tanque
         float angle =  (player.sprite.getRotation() * 3.1416/ 180.0f);  // Convierte grados a radianes
         
-        float xOffset = std::cos(angle) * 30; // Ajusta el valor 30 para cambiar la distancia del disparo
-        float yOffset = std::sin(angle) * 30;
+        float xOffset = std::cos(angle) * 257; // Comentario de macarena: esto esta mal
+        float yOffset = std::sin(angle) * 257;
         sprite.setPosition(startX + xOffset, startY + yOffset); 
 
         // Normalizar la dirección y multiplicar por la velocidad
