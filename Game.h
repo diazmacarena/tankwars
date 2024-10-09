@@ -18,11 +18,7 @@ public:
     // Constructor
     Game() : window(sf::VideoMode(1500, 1100), "Tanks Multiplayer"), 
              player1("tank1.png", 700, 300), 
-             player2("tank2.png", 600, 200) {
-        if (!bulletTexture.loadFromFile("Bullet.png")) {
-            // Handle error
-        }
-    }
+             player2("tank2.png", 600, 200) {}
 
     // Bucle principal del juego
     void run() {
@@ -36,7 +32,7 @@ public:
 private:
     // Función auxiliar para convertir grados a radianes
     float degreesToRadians(float degrees) {
-        return degrees * (3.14159265359f / 180.0f);
+        return degrees * (3.1416f / 180.0f);
     }
 
     // Procesar los eventos (teclas, cierre de ventana, etc.)
@@ -100,11 +96,11 @@ private:
         for (auto &bullet : bullets) {
             bullet.update();
             if (bullet.checkCollision(player1.sprite)) {
-                // Colisión con jugador 1
+                std::cout << "bala de jugador 2 acerto" << std::endl;
             }
             if (bullet.checkCollision(player2.sprite)) {
-                // Colisión con jugador 2
-            }
+                std::cout << "bala de jugador 1 acerto" << std::endl;
+                }
         }
     }
 
@@ -123,10 +119,10 @@ private:
 
     // Disparar una bala desde el tanque
     void shootBullet(Tank &player) {
-        sf::Vector2f direction = player.direction;
-        if (direction.x == 0 && direction.y == 0) {
-            direction.x = 1;  // Disparo por defecto
-        }
+        // Calcular la dirección basada en la rotación actual del tanque
+        float angleRadians = degreesToRadians(player.sprite.getRotation());
+        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
+
         bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, player);
     }
 };

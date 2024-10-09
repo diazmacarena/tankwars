@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>  // Include for std::cerr
+#include <iostream> 
 #include <cmath>
 
 class Bullet {
@@ -11,19 +11,14 @@ public:
 
     // Constructor de la clase Bullet
     Bullet(const std::string& textureFile, float startX, float startY, sf::Vector2f direction, Tank &player) {
-        
-        if (!texture.loadFromFile(textureFile)) {
-            // Manejar error
-            std::cerr << "Error loading texture from " << textureFile << std::endl;
-        }
+    
         sprite.setTexture(texture);
         
-        // Cambiar el tamaño de la bala: 0.3 significa reducir su tamaño al 30%
-        sprite.setScale(0.05f, 0.05f);  // Cambiar los factores de escala según prefieras
-        ////std::cout << "Bullet Size: " << sprite.getGlobalBounds().width << " x " << sprite.getGlobalBounds().height << std::endl;
+        sprite.setScale(0.05f, 0.05f);  // Cambiar los factores de escala
 
         // Calcular la posición de la bala delante del tanque
-        float angle =  (player.sprite.getRotation() * 3.14159265358979323846 / 180.0f);  // Convierte grados a radianes
+        float angle =  (player.sprite.getRotation() * 3.1416/ 180.0f);  // Convierte grados a radianes
+        
         float xOffset = std::cos(angle) * 30; // Ajusta el valor 30 para cambiar la distancia del disparo
         float yOffset = std::sin(angle) * 30;
         sprite.setPosition(startX + xOffset, startY + yOffset); 
@@ -33,7 +28,7 @@ public:
         if (length != 0) {
             direction /= length;  // Normalize
         }
-        velocity = direction * 5.0f;  // Velocidad de la bala
+        velocity = direction * 2.5f;  // Velocidad de la bala
         isActive = true;
     }
 
