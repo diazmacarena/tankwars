@@ -6,17 +6,20 @@
 
 class Game {
 private:
-    sf::RenderWindow window;
+     sf::RenderWindow window;
     Tank player1;
     Tank player2;
     std::vector<Bullet> bullets;
     sf::Texture bulletTexture;
     const float movementSpeed = 1.0f;  // Velocidad de movimiento
     const float rotationSpeed = 0.3f;  // Velocidad de rotación
+    const float shootInterval = 0.25f; // Intervalo entre disparos (en segundos)
+    sf::Clock shootClockPlayer1;  // Reloj para medir el tiempo del último disparo del jugador 1
+    sf::Clock shootClockPlayer2;  // Reloj para medir el tiempo del último disparo del jugador 2
 
 public:
     // Constructor
-    Game() : window(sf::VideoMode(1500, 1100), "Tanks Multiplayer"), 
+    Game() : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), 
              player1("tank1.png", 700, 300), 
              player2("tank2.png", 600, 200) {}
 

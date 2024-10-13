@@ -1,7 +1,7 @@
-#include "Game.h"
+#include "Interface.h"
 
 int main() {
-    Game game;
-    game.run();
+    INterface Jueguito;
+    Jueguito.ejecutar();
     return 0;
 }

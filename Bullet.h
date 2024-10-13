@@ -8,6 +8,7 @@ public:
     sf::Texture texture;
     sf::Vector2f velocity;
     bool isActive;
+    
 
     // Constructor de la clase Bullet
     Bullet(const std::string& textureFile, float startX, float startY, sf::Vector2f direction, Tank &player) {
@@ -21,7 +22,7 @@ public:
         // Calcular la posición de la bala delante del tanque
         float angle =  (player.sprite.getRotation() * 3.1416/ 180.0f);  // Convierte grados a radianes
         
-        float xOffset = std::cos(angle) * 257; // Comentario de macarena: esto esta mal
+        float xOffset = std::cos(angle) * 257; // Comentario de macarena: esto esta bien mal
         float yOffset = std::sin(angle) * 257;
         sprite.setPosition(startX + xOffset, startY + yOffset); 
 
@@ -30,7 +31,7 @@ public:
         if (length != 0) {
             direction /= length;  // Normalize
         }
-        velocity = direction * 2.5f;  // Velocidad de la bala
+        velocity = direction * 1.5f;  // Velocidad de la bala
         isActive = true;
     }
 

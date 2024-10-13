@@ -18,13 +18,13 @@ public:
 
         sprite.setTexture(texture);
 
-        sprite.setScale(0.5f, 0.5f);  
+        sprite.setScale(0.25f, 0.25f);  
 
         sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
 
         sprite.setPosition(initialX, initialY); 
 
-        speed = 2.0f;  // Velocidad del tanque
+        speed = 1.0f;  // Velocidad del tanque
         direction = sf::Vector2f(0, 0);
 }
 
