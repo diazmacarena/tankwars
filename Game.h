@@ -6,22 +6,53 @@
 
 class Game {
 private:
-     sf::RenderWindow window;
+    sf::RenderWindow window;
     Tank player1;
     Tank player2;
     std::vector<Bullet> bullets;
     sf::Texture bulletTexture;
+
     const float movementSpeed = 1.0f;  // Velocidad de movimiento
     const float rotationSpeed = 0.3f;  // Velocidad de rotación
-    const float shootInterval = 0.25f; // Intervalo entre disparos (en segundos)
-    sf::Clock shootClockPlayer1;  // Reloj para medir el tiempo del último disparo del jugador 1
-    sf::Clock shootClockPlayer2;  // Reloj para medir el tiempo del último disparo del jugador 2
+    const float shootInterval = 0.25f; // Intervalo mínimo entre disparos
+    const float reloadTime = 3.0f;     // Tiempo de recarga de balas (en segundos)
+    const int maxBullets = 3;          // Máximo de balas que puede tener un jugador
+    int player1Bullets = 2;            // Balas actuales del jugador 1
+    int player2Bullets = 2;            // Balas actuales del jugador 2
+
+    sf::Clock shootClockPlayer1;       // Reloj para el intervalo de disparos del jugador 1
+    sf::Clock shootClockPlayer2;       // Reloj para el intervalo de disparos del jugador 2
+    sf::Clock reloadClockPlayer1;      // Reloj para recargar balas del jugador 1
+    sf::Clock reloadClockPlayer2;      // Reloj para recargar balas del jugador 2
+
+    // Muros del borde de la ventana
+    sf::RectangleShape muroIzquierdo;
+    sf::RectangleShape muroDerecho;
+    sf::RectangleShape muroSuperior;
+    sf::RectangleShape muroInferior;
 
 public:
     // Constructor
     Game() : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), 
              player1("tank1.png", 700, 300), 
-             player2("tank2.png", 600, 200) {}
+             player2("tank2.png", 600, 200) {
+        // Configurar los muros
+        muroIzquierdo.setSize(sf::Vector2f(40, 1080)); // Muro a la izquierda
+        muroIzquierdo.setPosition(0, 0);
+        muroIzquierdo.setFillColor(sf::Color::White);
+
+        muroDerecho.setSize(sf::Vector2f(40, 1080));   // Muro a la derecha
+        muroDerecho.setPosition(1910, 0);
+        muroDerecho.setFillColor(sf::Color::White);
+
+        muroSuperior.setSize(sf::Vector2f(1920, 40));  // Muro superior
+        muroSuperior.setPosition(0, 0);
+        muroSuperior.setFillColor(sf::Color::Green);
+
+        muroInferior.setSize(sf::Vector2f(1920, 40));  // Muro inferior
+        muroInferior.setPosition(0, 1070);
+        muroInferior.setFillColor(sf::Color::Green);
+    }
 
     // Bucle principal del juego
     void run() {
@@ -46,19 +77,13 @@ private:
                 window.close();
             }
         }
-        
+
         // Controles de jugador 1
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-            float angleRadians = degreesToRadians(player1.sprite.getRotation());
-            float dx = std::cos(angleRadians) * movementSpeed;
-            float dy = std::sin(angleRadians) * movementSpeed;
-            player1.move(dx, dy);  // Mueve el tanque hacia adelante
+            moverTanque(player1, movementSpeed);  // Mueve el tanque hacia adelante
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            float angleRadians = degreesToRadians(player1.sprite.getRotation());
-            float dx = std::cos(angleRadians) * -movementSpeed;
-            float dy = std::sin(angleRadians) * -movementSpeed;
-            player1.move(dx, dy);  // Mueve el tanque hacia atrás
+            moverTanque(player1, -movementSpeed);  // Mueve el tanque hacia atrás
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             player1.rotate(-rotationSpeed);  // Rotación hacia la izquierda
@@ -66,22 +91,18 @@ private:
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             player1.rotate(rotationSpeed);   // Rotación hacia la derecha
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            shootBullet(player1);
+
+        // Solo disparar si ha pasado suficiente tiempo desde el último disparo
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && shootClockPlayer1.getElapsedTime().asSeconds() >= shootInterval) {
+            shootBullet(player1, player1Bullets, shootClockPlayer1, reloadClockPlayer1);
         }
-        
+
         // Controles de jugador 2
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            float angleRadians = degreesToRadians(player2.sprite.getRotation());
-            float dx = std::cos(angleRadians) * movementSpeed;
-            float dy = std::sin(angleRadians) * movementSpeed;
-            player2.move(dx, dy);  // Mueve el tanque hacia adelante
+            moverTanque(player2, movementSpeed);  // Mueve el tanque hacia adelante
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            float angleRadians = degreesToRadians(player2.sprite.getRotation());
-            float dx = std::cos(angleRadians) * -movementSpeed;
-            float dy = std::sin(angleRadians) * -movementSpeed;
-            player2.move(dx, dy);  // Mueve el tanque hacia atrás
+            moverTanque(player2, -movementSpeed);  // Mueve el tanque hacia atrás
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             player2.rotate(-rotationSpeed);  // Rotación hacia la izquierda
@@ -89,8 +110,29 @@ private:
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             player2.rotate(rotationSpeed);   // Rotación hacia la derecha
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
-            shootBullet(player2);
+
+        // Solo disparar si ha pasado suficiente tiempo desde el último disparo
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && shootClockPlayer2.getElapsedTime().asSeconds() >= shootInterval) {
+            shootBullet(player2, player2Bullets, shootClockPlayer2, reloadClockPlayer2);
+        }
+    }
+
+    // Mover el tanque y verificar colisiones con los muros
+    void moverTanque(Tank &player, float speed) {
+        float angleRadians = degreesToRadians(player.sprite.getRotation());
+        float dx = std::cos(angleRadians) * speed;
+        float dy = std::sin(angleRadians) * speed;
+
+        // Movimiento provisional
+        player.move(dx, dy);
+
+        // Verificar colisiones con los muros
+        if (player.sprite.getGlobalBounds().intersects(muroIzquierdo.getGlobalBounds()) ||
+            player.sprite.getGlobalBounds().intersects(muroDerecho.getGlobalBounds()) ||
+            player.sprite.getGlobalBounds().intersects(muroSuperior.getGlobalBounds()) ||
+            player.sprite.getGlobalBounds().intersects(muroInferior.getGlobalBounds())) {
+            // Si colisiona, revertir el movimiento
+            player.move(-dx, -dy);
         }
     }
 
@@ -98,12 +140,59 @@ private:
     void update() {
         for (auto &bullet : bullets) {
             bullet.update();
-            if (bullet.checkCollision(player1.sprite)) {
-                std::cout << "bala de jugador 2 acerto" << std::endl;
+
+            // Verificar colisión de la bala con los muros
+            if (bullet.sprite.getGlobalBounds().intersects(muroIzquierdo.getGlobalBounds()) ||
+                bullet.sprite.getGlobalBounds().intersects(muroDerecho.getGlobalBounds())) {
+                bullet.velocity.x = -bullet.velocity.x;  // Invertir dirección en el eje X
+                bullet.collisionCount++;  // Incrementar el contador de colisiones
+
             }
-            if (bullet.checkCollision(player2.sprite)) {
-                std::cout << "bala de jugador 1 acerto" << std::endl;
-                }
+
+            if (bullet.sprite.getGlobalBounds().intersects(muroSuperior.getGlobalBounds()) ||
+                bullet.sprite.getGlobalBounds().intersects(muroInferior.getGlobalBounds())) {
+                bullet.velocity.y = -bullet.velocity.y;  // Invertir dirección en el eje Y
+                bullet.collisionCount++;  // Incrementar el contador de colisiones
+
+            }
+
+            // Desactivar la bala después de 5 colisiones
+            if (bullet.collisionCount >= 5) {
+            bullet.isActive = false;
+            }
+
+
+        // Verificar colisión de la bala con los tanques
+        if (bullet.checkCollision(player1.sprite)) {  // Usar player1.sprite
+            player1.restarVida();  // Restar una vida al tanque
+            std::cout << "Jugador 1 ha recibido un impacto, vidas restantes: " << player1.vidas << std::endl;
+            bullet.isActive = false;  // Desactivar la bala después de impactar
+        }
+        if (bullet.checkCollision(player2.sprite)) {  // Usar player2.sprite
+            player2.restarVida();  // Restar una vida al tanque
+            std::cout << "Jugador 2 ha recibido un impacto, vidas restantes: " << player2.vidas << std::endl;
+            bullet.isActive = false;  // Desactivar la bala después de impactar
+        }
+
+
+        // Verificar si algún tanque ha sido destruido
+        if (player1.estaDestruido()) {
+            std::cout << "Jugador 1 ha sido destruido." << std::endl;
+        }
+        if (player2.estaDestruido()) {
+            std::cout << "Jugador 2 ha sido destruido." << std::endl;
+        }
+    }
+
+
+        // Recarga automática de balas cada 3 segundos
+        if (reloadClockPlayer1.getElapsedTime().asSeconds() >= reloadTime && player1Bullets < maxBullets) {
+            player1Bullets++;
+            reloadClockPlayer1.restart();  // Reiniciar el reloj de recarga
+        }
+        if (reloadClockPlayer2.getElapsedTime().asSeconds() >= reloadTime && player2Bullets < maxBullets) {
+            player2Bullets++;
+            reloadClockPlayer2.restart();  // Reiniciar el reloj de recarga
         }
     }
 
@@ -117,15 +206,29 @@ private:
             bullet.draw(window);
         }
 
+        // Dibujar los muros
+        window.draw(muroIzquierdo);
+        window.draw(muroDerecho);
+        window.draw(muroSuperior);
+        window.draw(muroInferior);
+
         window.display();
     }
 
     // Disparar una bala desde el tanque
-    void shootBullet(Tank &player) {
-        // Calcular la dirección basada en la rotación actual del tanque
-        float angleRadians = degreesToRadians(player.sprite.getRotation());
-        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
+    void shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
+        if (bulletCount > 0) {
+            float angleRadians = degreesToRadians(player.sprite.getRotation());
+            sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
 
-        bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, player);
+            // Crear una nueva bala, pasando ahora &player como puntero al tanque
+            bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
+
+            bulletCount--;  // Decrementar el contador de balas
+            shootClock.restart();
+            reloadClock.restart();
+        }
     }
+
+
 };
