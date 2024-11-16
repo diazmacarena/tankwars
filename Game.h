@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "Tank.h"
 #include "Bullet.h"
+#include "Wall.h"
 #include <vector>
 
 class Game {
@@ -14,6 +15,7 @@ private:
     std::vector<Bullet> bullets;
     sf::Texture bulletTexture;
 
+    // Parámetros de juego
     const float movementSpeed = 1.0f;
     const float rotationSpeed = 0.3f;
     const float shootInterval = 0.25f;
@@ -27,10 +29,13 @@ private:
     sf::Clock reloadClockPlayer1;
     sf::Clock reloadClockPlayer2;
 
-    sf::RectangleShape muroIzquierdo;
-    sf::RectangleShape muroDerecho;
-    sf::RectangleShape muroSuperior;
-    sf::RectangleShape muroInferior;
+    std::vector<sf::RectangleShape> muros;
+
+    // Muros definidos como instancias de la clase Wall
+    Wall muroIzquierdo;
+    Wall muroDerecho;
+    Wall muroSuperior;
+    Wall muroInferior;
 
     float degreesToRadians(float degrees);
     void processEvents();
@@ -38,6 +43,8 @@ private:
     void update();
     void render();
     void shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock);
+
+    void cargarNivel(const std::string& filename);
 
 public:
     Game();

@@ -1,0 +1,4 @@
+Laberintos
+Efectos de sonido
+Menus de seleccion
+Cambiar niveles

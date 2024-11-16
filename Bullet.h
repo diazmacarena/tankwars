@@ -26,6 +26,13 @@ public:
 
     // Detectar colisiones con otro tanque, ignorando el tanque que disparó la bala
     bool checkCollision(const sf::Sprite &target);
+
+    void handleWallCollision(const sf::FloatRect &wallBounds);
+
+private:
+    void reverseX();  // Invertir dirección en X
+    void reverseY();  // Invertir dirección en Y
+    
 };
 
 #endif

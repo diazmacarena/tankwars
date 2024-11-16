@@ -9,7 +9,7 @@ Bullet::Bullet(const std::string& textureFile, float startX, float startY, sf::V
     }
     sprite.setTexture(texture);
     sprite.setScale(0.05f, 0.05f);  // Cambiar los factores de escala
-
+    sprite.setScale(0.1f, 0.1f); // Ajustar tamaño de la bala
     // Posicionar la bala en el cañón (a la derecha del tanque, centrado verticalmente)
     float angle = shooter->sprite.getRotation() * 3.1416f / 180.0f;  // Convierte grados a radianes
     float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2);  // Posicionar a la derecha del tanque
@@ -38,8 +38,40 @@ void Bullet::draw(sf::RenderWindow &window) {
     }
 }
 
-// Detectar colisiones con otro tanque, ignorando el tanque que disparó la bala
+// Detectar colisión con otro objeto
 bool Bullet::checkCollision(const sf::Sprite &target) {
-    // Verificamos que la bala esté activa y que no esté colisionando con el tanque que la disparó
-    return isActive && &target != &owner->sprite && sprite.getGlobalBounds().intersects(target.getGlobalBounds());
+    if (sprite.getGlobalBounds().intersects(target.getGlobalBounds())) {
+        isActive = false; // Desactivar la bala tras colisión
+        return true;
+    }
+    return false;
+}
+
+// Detectar colisión con un muro y ajustar dirección
+void Bullet::handleWallCollision(const sf::FloatRect &wallBounds) {
+    sf::FloatRect bulletBounds = sprite.getGlobalBounds();
+
+    // Verificar colisión en X
+    if (bulletBounds.left < wallBounds.left || 
+        bulletBounds.left + bulletBounds.width > wallBounds.left + wallBounds.width) {
+        reverseX(); // Invertir dirección en X
+        collisionCount++;
+    }
+
+    // Verificar colisión en Y
+    if (bulletBounds.top < wallBounds.top || 
+        bulletBounds.top + bulletBounds.height > wallBounds.top + wallBounds.height) {
+        reverseY(); // Invertir dirección en Y
+        collisionCount++;
+    }
+}
+
+// Invertir dirección en X
+void Bullet::reverseX() {
+    velocity.x = -velocity.x;
+}
+
+// Invertir dirección en Y
+void Bullet::reverseY() {
+    velocity.y = -velocity.y;
 }

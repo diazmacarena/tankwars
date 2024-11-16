@@ -6,7 +6,7 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
     }
 
     sprite.setTexture(texture);
-    sprite.setScale(0.25f, 0.25f);
+    sprite.setScale(0.15f, 0.15f);
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
     sprite.setPosition(initialX, initialY);
 
@@ -31,11 +31,15 @@ void Tank::draw(sf::RenderWindow &window) {
 void Tank::restarVida() {
     if (vidas > 0) {
         vidas--;
+        std::cout << "Vida del tanque reducida. Vidas restantes: " << vidas << std::endl;
     }
+
     if (vidas == 0) {
+        std::cout << "El tanque ha sido destruido." << std::endl;
         ocultar();
     }
 }
+
 
 bool Tank::estaDestruido() const {
     return vidas <= 0;
