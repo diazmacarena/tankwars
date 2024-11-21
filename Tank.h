@@ -12,6 +12,7 @@ public:
     sf::Vector2f direction;
     int vidas;  // Atributo para almacenar las vidas del tanque
 
+    Tank();
     // Constructor de la clase Tank
     Tank(const std::string& textureFile, float initialX, float initialY);
 

@@ -13,6 +13,7 @@ private:
     Tank player1;
     Tank player2;
     std::vector<Bullet> bullets;
+    std::string mapFile;
     sf::Texture bulletTexture;
 
     // Parámetros de juego
@@ -48,6 +49,7 @@ private:
 
 public:
     Game();
+    Game(const std::string& mapFile);
     void run();
 };
 

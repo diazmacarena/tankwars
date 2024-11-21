@@ -1,8 +1,9 @@
-// main.cpp
-#include "Game.h"
+#include "GameInterface.h"
 
 int main() {
-    Game game;
-    game.run();
+    // Crear instancia de GameInterface y ejecutar el menú principal
+    GameInterface gameInterface;
+    gameInterface.run();
+
     return 0;
 }

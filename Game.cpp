@@ -6,13 +6,19 @@
 // Tamaño de cada celda en el laberinto
 const int TILE_SIZE = 40;
 
+
+
 Game::Game() 
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
       player1("tank1.png", 200, 150),
       player2("tank2.png", 1600, 800) {
-    cargarNivel("nivel1.txt");  // Cargar el nivel desde un archivo
+    cargarNivel(mapFile);  // Cargar el nivel desde un archivo
 }
 
+Game::Game(const std::string& nivel) : window(sf::VideoMode(1920,1080), "Tanks Multiplayer"),
+    player1("tank1.png", 200, 150), player2("tank2.png",1600,800){
+        cargarNivel(nivel);
+    }
 float Game::degreesToRadians(float degrees) {
     return degrees * (3.1416f / 180.0f);
 }
