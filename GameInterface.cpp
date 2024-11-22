@@ -8,7 +8,7 @@ GameInterface::GameInterface() : currentOption(0) {
     // Opciones del menú
     std::vector<std::string> options = {"Seleccion de niveles", "Como se juega", "Salir"};
     for (size_t i = 0; i < options.size(); ++i) {
-        sf::Text text(options[i], font, 30);
+        sf::Text text(options[i], font, 80);
         text.setPosition(300, 200 + i * 50);
         text.setFillColor(i == currentOption ? sf::Color::Yellow : sf::Color::White);
         menuOptions.push_back(text);

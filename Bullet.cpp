@@ -8,7 +8,7 @@ Bullet::Bullet(const std::string& textureFile, float startX, float startY, sf::V
         std::cerr << "Error: No se pudo cargar la textura de la bala " << textureFile << std::endl;
     }
     sprite.setTexture(texture);
-    sprite.setScale(0.05f, 0.05f);  // Cambiar los factores de escala
+    sprite.setScale(0.03f, 0.03f);  // Cambiar los factores de escala
     sprite.setScale(0.1f, 0.1f); // Ajustar tamaño de la bala
     // Posicionar la bala en el cañón (a la derecha del tanque, centrado verticalmente)
     float angle = shooter->sprite.getRotation() * 3.1416f / 180.0f;  // Convierte grados a radianes
@@ -21,7 +21,7 @@ Bullet::Bullet(const std::string& textureFile, float startX, float startY, sf::V
     if (length != 0) {
         direction /= length;  // Normalize
     }
-    velocity = direction * 1.5f;  // Velocidad de la bala
+    velocity = direction * 1.1f;  // Velocidad de la bala
 }
 
 // Movimiento de la bala

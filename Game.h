@@ -5,7 +5,9 @@
 #include "Tank.h"
 #include "Bullet.h"
 #include "Wall.h"
+#include "DestructibleWall.h" // Incluir clase de muros destructibles
 #include <vector>
+#include <string>
 
 class Game {
 private:
@@ -30,13 +32,8 @@ private:
     sf::Clock reloadClockPlayer1;
     sf::Clock reloadClockPlayer2;
 
-    std::vector<sf::RectangleShape> muros;
-
-    // Muros definidos como instancias de la clase Wall
-    Wall muroIzquierdo;
-    Wall muroDerecho;
-    Wall muroSuperior;
-    Wall muroInferior;
+    std::vector<Wall> walls;                   // Vector para muros indestructibles
+    std::vector<DestructibleWall> destructibleWalls; // Vector para muros destructibles
 
     float degreesToRadians(float degrees);
     void processEvents();
@@ -45,7 +42,7 @@ private:
     void render();
     void shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock);
 
-    void cargarNivel(const std::string& filename);
+    void cargarNivel(const std::string& filename); // Método para cargar los niveles y muros
 
 public:
     Game();
@@ -54,3 +51,4 @@ public:
 };
 
 #endif // GAME_H
+

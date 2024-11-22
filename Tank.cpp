@@ -2,7 +2,7 @@
 
 
 // Constructor por defecto
-Tank::Tank() : vidas(3), speed(1.0f), direction(0, 0) {
+Tank::Tank() : vidas(3), speed(0.4f), direction(0, 0) {
     std::cout << "Tanque creado con valores predeterminados.\n";
     // Opcionalmente podrías cargar una textura predeterminada
     if (!texture.loadFromFile("default_tank.png")) {
@@ -21,7 +21,7 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
     }
 
     sprite.setTexture(texture);
-    sprite.setScale(0.15f, 0.15f);
+    sprite.setScale(0.3f, 0.3f);
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
     sprite.setPosition(initialX, initialY);
 

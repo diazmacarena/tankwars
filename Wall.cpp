@@ -7,13 +7,11 @@ Wall::Wall(float width, float height, float posX, float posY, const sf::Color& c
     shape.setFillColor(color);
 }
 
-// Dibuja el muro en la ventana proporcionada
+// Devuelve los límites del muro para detección de colisiones
 void Wall::draw(sf::RenderWindow& window) const {
     window.draw(shape);
 }
 
-// Devuelve los límites del muro para detección de colisiones
 const sf::FloatRect Wall::getBounds() const {
     return shape.getGlobalBounds();
 }
-
