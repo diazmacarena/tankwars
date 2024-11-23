@@ -109,7 +109,7 @@ void GameInterface::showInstructions(sf::RenderWindow &window) {
         window.clear();
 
         sf::Text instructionsText1(
-            "Tanque 1: W A S D <\npara moverse",
+            "Tanque 1: W A S D \npara moverse",
             font, 30
         );
         instructionsText1.setPosition(100, 200);

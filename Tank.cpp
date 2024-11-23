@@ -9,7 +9,7 @@ Tank::Tank() : vidas(3), speed(0.4f), direction(0, 0) {
         std::cerr << "Error: No se pudo cargar la textura predeterminada.\n";
     }
     sprite.setTexture(texture);
-    sprite.setScale(0.15f, 0.15f);
+    sprite.setScale(0.09f, 0.09f);
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
     sprite.setPosition(0, 0);  // Posición inicial predeterminada
 }
@@ -21,11 +21,11 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
     }
 
     sprite.setTexture(texture);
-    sprite.setScale(0.3f, 0.3f);
+    sprite.setScale(0.15f , 0.15f);
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
     sprite.setPosition(initialX, initialY);
 
-    speed = 1.0f;  // Velocidad del tanque
+    speed = 0.75f;  // Velocidad del tanque
     direction = sf::Vector2f(0, 0);
 }
 
