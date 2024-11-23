@@ -33,11 +33,14 @@ private:
     sf::Clock reloadClockPlayer2;
 
     std::vector<Wall> walls;                   // Vector para muros indestructibles
-    std::vector<DestructibleWall> destructibleWalls; // Vector para muros destructibles
+    std::vector<DestructibleWall> destructibleWalls;
+     // Vector para muros destructibles
+    sf::Vector2f lastValidPositionPlayer1;
+    sf::Vector2f lastValidPositionPlayer2;
 
     float degreesToRadians(float degrees);
     void processEvents();
-    void moverTanque(Tank &player, float speed);
+    void moverTanque(Tank &player, float speed, sf::Vector2f& lastpositions);
     void update();
     void render();
     void shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock);

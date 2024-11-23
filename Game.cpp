@@ -58,9 +58,9 @@ void Game::processEvents() {
 
     // Control del jugador 1
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) 
-        moverTanque(player1, movementSpeed);
+        moverTanque(player1, movementSpeed, lastValidPositionPlayer1);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) 
-        moverTanque(player1, -movementSpeed);
+        moverTanque(player1, -movementSpeed, lastValidPositionPlayer1);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) 
         player1.rotate(-rotationSpeed);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
@@ -71,9 +71,9 @@ void Game::processEvents() {
 
     // Control del jugador 2
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) 
-        moverTanque(player2, movementSpeed);
+        moverTanque(player2, movementSpeed, lastValidPositionPlayer2);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        moverTanque(player2, -movementSpeed);
+        moverTanque(player2, -movementSpeed, lastValidPositionPlayer2);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         player2.rotate(-rotationSpeed);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
@@ -83,17 +83,14 @@ void Game::processEvents() {
     }
 }
 
-// Movimiento y manejo de colisiones del tanque
-void Game::moverTanque(Tank &player, float speed) {
+    void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPosition) {
     float angleRadians = degreesToRadians(player.sprite.getRotation());
     float dx = std::cos(angleRadians) * speed;
     float dy = std::sin(angleRadians) * speed;
 
-    // Guardar la última posición sin colisión
-    static sf::Vector2f lastValidPosition = player.sprite.getPosition();
+    // Intentar mover el tanque temporalmente para verificar colisiones
     player.move(dx, dy);
 
-    // Función para calcular el porcentaje de solapamiento entre el tanque y el muro
     auto calculateOverlapPercentage = [&](const sf::FloatRect& tankBounds, const sf::FloatRect& wallBounds) -> float {
         float overlapX = std::max(0.0f, std::min(tankBounds.left + tankBounds.width, wallBounds.left + wallBounds.width) - 
                                       std::max(tankBounds.left, wallBounds.left));
@@ -112,9 +109,9 @@ void Game::moverTanque(Tank &player, float speed) {
         
         float overlapPercentage = calculateOverlapPercentage(tankBounds, muroBounds);
 
-        // Si el tanque tiene un solapamiento mayor o igual al 12%, restaurar a la última posición sin colisión
-        if (overlapPercentage >= 3.0f) {
-            player.sprite.setPosition(lastValidPosition);  // Restaurar a la posición sin colisión
+        // Si el tanque tiene un solapamiento del 12% o más, restaurarlo a su última posición sin colisión
+        if (overlapPercentage >= 12.0f) {
+            player.sprite.setPosition(lastValidPosition);
         }
     };
 
@@ -138,14 +135,75 @@ void Game::moverTanque(Tank &player, float speed) {
         }
     }
 
-    // Actualizar la última posición válida solo si no hay colisión
+    // Solo actualizar la última posición válida si no hay colisión
     if (!isColliding) {
         lastValidPosition = player.sprite.getPosition();
+    } else {
+        // Si hay una colisión, revertir a la última posición válida y no permitir movimiento hacia el muro
+        player.sprite.setPosition(lastValidPosition);
     }
 }
 
 
-// Actualización del estado del juego
+// Renderizado de la escena del juego
+void Game::render() {
+    window.clear();
+    player1.draw(window);
+    player2.draw(window);
+
+    for (const auto& wall : destructibleWalls) {
+        wall.draw(window);
+    }
+
+    for (const auto& wall : walls) {
+        wall.draw(window);
+    }
+
+    for (auto& bullet : bullets) {
+        if (bullet.isActive) {
+            bullet.draw(window);
+        }
+    }
+
+    window.display();
+}
+
+// Disparar balas
+void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
+    if (bulletCount > 0) {
+        float angleRadians = degreesToRadians(player.sprite.getRotation());
+        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
+
+        bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
+
+        bulletCount--;
+        shootClock.restart();
+        reloadClock.restart();
+    }
+}
+
+// Dibuja las vidas de los tanques
+void drawLives(sf::RenderWindow& window, const std::vector<Tank>& tanks, sf::Font& font) {
+    for (const auto& tank : tanks) {
+        if (!tank.estaDestruido()) {
+            sf::Text text;
+            text.setFont(font);
+            text.setString("Vidas: " + std::to_string(tank.vidas));
+            text.setCharacterSize(16);
+            text.setFillColor(sf::Color::White);
+            text.setPosition(tank.sprite.getPosition().x - 20, tank.sprite.getPosition().y - 50);
+            window.draw(text);
+        }
+    }
+}
+
+void Game::run() {
+    while (window.isOpen()) {
+        processEvents();
+        update();
+        render();
+    }
+}
 void Game::update() {
     for (auto& bullet : bullets) {
         if (!bullet.isActive) continue;
@@ -228,63 +286,3 @@ void Game::update() {
     }
 }
 
-
-// Renderizado de la escena del juego
-void Game::render() {
-    window.clear();
-    player1.draw(window);
-    player2.draw(window);
-
-    for (const auto& wall : destructibleWalls) {
-        wall.draw(window);
-    }
-
-    for (const auto& wall : walls) {
-        wall.draw(window);
-    }
-
-    for (auto& bullet : bullets) {
-        if (bullet.isActive) {
-            bullet.draw(window);
-        }
-    }
-
-    window.display();
-}
-
-// Disparar balas
-void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
-    if (bulletCount > 0) {
-        float angleRadians = degreesToRadians(player.sprite.getRotation());
-        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
-
-        bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
-
-        bulletCount--;
-        shootClock.restart();
-        reloadClock.restart();
-    }
-}
-
-// Dibuja las vidas de los tanques
-void drawLives(sf::RenderWindow& window, const std::vector<Tank>& tanks, sf::Font& font) {
-    for (const auto& tank : tanks) {
-        if (!tank.estaDestruido()) {
-            sf::Text text;
-            text.setFont(font);
-            text.setString("Vidas: " + std::to_string(tank.vidas));
-            text.setCharacterSize(16);
-            text.setFillColor(sf::Color::White);
-            text.setPosition(tank.sprite.getPosition().x - 20, tank.sprite.getPosition().y - 50);
-            window.draw(text);
-        }
-    }
-}
-
-void Game::run() {
-    while (window.isOpen()) {
-        processEvents();
-        update();
-        render();
-    }
-}

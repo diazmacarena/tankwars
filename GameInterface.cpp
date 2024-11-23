@@ -9,8 +9,8 @@ GameInterface::GameInterface() : currentOption(0) {
     std::vector<std::string> options = {"Seleccion de niveles", "Como se juega", "Salir"};
     for (size_t i = 0; i < options.size(); ++i) {
         sf::Text text(options[i], font, 80);
-        text.setPosition(300, 200 + i * 50);
-        text.setFillColor(i == currentOption ? sf::Color::Yellow : sf::Color::White);
+        text.setPosition(500, 200 + i * 200);
+        text.setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
         menuOptions.push_back(text);
     }
 }
@@ -29,7 +29,7 @@ void GameInterface::run() {
 void GameInterface::drawMenu(sf::RenderWindow &window) {
     // Actualiza el color de las opciones según la selección
     for (size_t i = 0; i < menuOptions.size(); ++i) {
-        menuOptions[i].setFillColor(i == currentOption ? sf::Color::Yellow : sf::Color::White);
+        menuOptions[i].setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
         window.draw(menuOptions[i]);
     }
 }
@@ -86,9 +86,9 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
         window.clear();
 
         // Muestra el nivel actual seleccionado
-        sf::Text levelText("Selecciona Nivel: " + std::to_string(level), font, 30);
-        levelText.setPosition(300, 300);
-        levelText.setFillColor(sf::Color::Yellow);
+        sf::Text levelText("Selecciona Nivel: " + std::to_string(level), font, 50);
+        levelText.setPosition(700, 450);
+        levelText.setFillColor(sf::Color::Green);
         window.draw(levelText);
 
         window.display();
@@ -108,13 +108,26 @@ void GameInterface::showInstructions(sf::RenderWindow &window) {
 
         window.clear();
 
-        sf::Text instructionsText(
-            "Controles:\nTanque 1: W A S D para moverse\nTanque 2: Flechas para moverse\nPresiona Enter para regresar",
-            font, 20
+        sf::Text instructionsText1(
+            "Tanque 1: W A S D <\npara moverse",
+            font, 30
         );
-        instructionsText.setPosition(100, 200);
-        instructionsText.setFillColor(sf::Color::White);
-        window.draw(instructionsText);
+        instructionsText1.setPosition(100, 200);
+        instructionsText1.setFillColor(sf::Color::White);
+        window.draw(instructionsText1);
+
+        sf::Text instructionsText2("Tanque2: Usa las flechas \npara moverse" , font , 30);
+        instructionsText2.setPosition(500, 200);
+        instructionsText2.setFillColor(sf::Color::White);
+        window.draw(instructionsText2);
+        
+
+        sf::Text instructionsText3(
+            "Presiona la tecla enter para volver" , font , 30
+        );
+        instructionsText3.setPosition(500, 800);
+        instructionsText3.setFillColor(sf::Color::White);
+        window.draw(instructionsText3);
 
         window.display();
     }
