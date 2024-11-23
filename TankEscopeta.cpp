@@ -2,8 +2,13 @@
 #include <iostream>
 
 // Constructor de TankEscopeta
-TankEscopeta::TankEscopeta(const std::string& textureFile, float initialX, float initialY) 
-    : Tank(textureFile, initialX, initialY), cartucho(4, 15.0f) {}
+TankEscopeta::TankEscopeta(const std::string& textureFile, float initialX, float initialY)
+    : Tank(textureFile, initialX, initialY), cartucho(4, 15.0f) {
+    std::cout << "TankEscopeta creado correctamente con la textura " << textureFile << std::endl;
+}
+
+
+
 
 // Método para disparar proyectiles
 void TankEscopeta::disparar(std::vector<sf::Vector2f>& direcciones) {

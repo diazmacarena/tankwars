@@ -19,9 +19,12 @@ private:
     void showInstructions(sf::RenderWindow &window);
 
     // Variables de estado
-    int currentOption; // Indica la opción seleccionada en el menú
-    std::vector<sf::Text> menuOptions; // Las opciones del menú
-    sf::Font font; // Fuente para todo el texto
+    int currentOption;                 // Opción seleccionada en el menú
+    std::vector<sf::Text> menuOptions; // Opciones del menú
+    sf::Font font;                     // Fuente para todo el texto
+
+    int player1TankType; // Tipo de tanque del jugador 1: 0 = Tank, 1 = TankEscopeta
+    int player2TankType; // Tipo de tanque del jugador 2: 0 = Tank, 1 = TankEscopeta
 };
 
 #endif // GAME_INTERFACE_H

@@ -7,16 +7,61 @@
 const int TILE_SIZE = 40;
 
 // Constructor
-Game::Game() 
+#include "Game.h"
+#include <cmath>
+#include <fstream>
+#include <iostream>
+
+// Constructor predeterminado para 2 jugadores (1 Tank, 1 Tank)
+Game::Game()
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
-      player1("tank1.png", 200, 150),
-      player2("tank2.png", 1600, 800) {
-    cargarNivel(mapFile);  // Cargar el nivel desde un archivo
+      player1("Tank1.png", 200, 150),
+      player2("Tank2.png", 1600, 800),
+      player3("Tank3.png", 400, 300),  // Inicializamos player3 y player4 con valores predeterminados
+      player4("Tank4.png", 1400, 700) {
+    cargarNivel(mapFile);
 }
 
+// Constructor para 2 jugadores (1 Tank, 1 Tank)
 Game::Game(const std::string& nivel)
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
-      player1("tank1.png", 200, 150), player2("tank2.png", 1600, 800) {
+      player1("Tank1.png", 200, 150),
+      player2("Tank2.png", 1600, 800),
+      player3("Tank3.png", 400, 300),
+      player4("Tank4.png", 1400, 700) {
+    cargarNivel(nivel);
+}
+
+// Constructor para casos 1-2, 1-4, 3-2, 3-4
+Game::Game(int playersType, const std::string& nivel)
+    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
+      player1("Tank1.png", 200, 150),
+      player2("Tank2.png", 1600, 800),
+      player3("Tank3.png", 400, 300),  // Valores predeterminados para TankEscopeta
+      player4("Tank4.png", 1400, 700) {
+    switch (playersType) {
+        case 1: // Tank vs Tank
+            player1 = Tank("Tank1.png", 200, 150);
+            player2 = Tank("Tank2.png", 1600, 800);
+            break;
+        case 2: // Tank vs TankEscopeta
+            player1 = Tank("Tank1.png", 200, 150);
+            player4 = TankEscopeta("Tank4.png", 1400, 700);
+            break;
+        case 3: // TankEscopeta vs Tank
+            player3 = TankEscopeta("Tank3.png", 400, 300);
+            player2 = Tank("Tank2.png", 1600, 800);
+            break;
+        case 4: // TankEscopeta vs TankEscopeta
+            player3 = TankEscopeta("Tank3.png", 400, 300);
+            player4 = TankEscopeta("Tank4.png", 1400, 700);
+            break;
+        default:
+            std::cerr << "Tipo de jugadores no válido. Usando configuración predeterminada (1 Tank, 1 TankEscopeta).\n";
+            player1 = Tank("Tank1.png", 200, 150);
+            player4 = TankEscopeta("Tank4.png", 1400, 700);
+            break;
+    }
     cargarNivel(nivel);
 }
 
@@ -181,7 +226,16 @@ void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf
         reloadClock.restart();
     }
 }
-
+void Game::shootEscopeta(TankEscopeta &player, sf::Clock &shootClock) {
+    std::vector<sf::Vector2f> direcciones;
+    if (player.getBalasRestantes() > 0) {
+        player.disparar(direcciones);
+        for (const auto &direccion : direcciones) {
+            bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direccion, &player);
+        }
+        shootClock.restart();
+    }
+}
 // Dibuja las vidas de los tanques
 void drawLives(sf::RenderWindow& window, const std::vector<Tank>& tanks, sf::Font& font) {
     for (const auto& tank : tanks) {
