@@ -69,9 +69,9 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             } else if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Up) {
+                if (event.key.code == sf::Keyboard::Down) {
                     level = (level > 1) ? level - 1 : 10;
-                } else if (event.key.code == sf::Keyboard::Down) {
+                } else if (event.key.code == sf::Keyboard::Up) {
                     level = (level < 10) ? level + 1 : 1;
                 } else if (event.key.code == sf::Keyboard::Enter) {
                     // Selecciona el archivo de mapa según el nivel

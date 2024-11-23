@@ -25,7 +25,7 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
     sprite.setPosition(initialX, initialY);
 
-    speed = 0.75f;  // Velocidad del tanque
+    speed = 0.55f;  // Velocidad del tanque
     direction = sf::Vector2f(0, 0);
 }
 

@@ -11,9 +11,9 @@ Bullet::Bullet(const std::string& textureFile, float startX, float startY, sf::V
     sprite.setScale(0.07f, 0.07f);  // Cambiar los factores de escala
     // Posicionar la bala en el cañón (a la derecha del tanque, centrado verticalmente)
     float angle = shooter->sprite.getRotation() * 3.1416f / 180.0f;  // Convierte grados a radianes
-    float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2);  // Posicionar a la derecha del tanque
-    float yOffset = std::sin(angle) * (shooter->sprite.getLocalBounds().height / 2); // Centrar en la mitad vertical
-    sprite.setPosition(startX + xOffset - 90 , startY + yOffset );
+    float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2.5);  // Posicionar a la derecha del tanque
+    float yOffset = std::sin(angle) * (shooter->sprite.getLocalBounds().height / 2.5); // Centrar en la mitad vertical
+    sprite.setPosition(startX + xOffset, startY + yOffset );
 
     // Normalizar la dirección y multiplicar por la velocidad
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
