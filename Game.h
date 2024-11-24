@@ -13,6 +13,7 @@
 
 class Game {
 private:
+
     sf::RenderWindow window;
     Tank* player1;
     Tank* player2;
@@ -34,11 +35,15 @@ private:
     sf::Clock shootClockPlayer2;
     sf::Clock reloadClockPlayer1;
     sf::Clock reloadClockPlayer2;
+    sf::Clock gameOverClock;
 
     std::vector<Wall> walls;
     std::vector<DestructibleWall> destructibleWalls;
     sf::Vector2f lastValidPositionPlayer1;
     sf::Vector2f lastValidPositionPlayer2;
+    sf::Font font;
+    sf::Text winnerText;
+    bool gameOver;
 
     float degreesToRadians(float degrees);
     void processEvents();

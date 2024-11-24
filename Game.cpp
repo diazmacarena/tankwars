@@ -6,15 +6,9 @@
 // Tamaño de cada celda en el laberinto
 const int TILE_SIZE = 40;
 
-// Constructor
-#include "Game.h"
-#include <cmath>
-#include <fstream>
-#include <iostream>
-
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
-    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer") {
+    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), gameOver(false)  {
     // Initialize players based on playersType
     switch (playersType) {
         case 1: // Tank vs Tank
@@ -39,6 +33,17 @@ Game::Game(int playersType, const std::string& nivel)
             player2 = new TankEscopeta("Tank2.png", 1600, 800);
             break;
     }
+
+    // Cargar la fuente
+    if (!font.loadFromFile("Extra Days.ttf")) {
+        std::cerr << "Error: No se pudo cargar la fuente Extra Days.ttf" << std::endl;
+    }
+
+    // Configurar el texto del ganador
+    winnerText.setFont(font);
+    winnerText.setCharacterSize(80);
+    winnerText.setFillColor(sf::Color::Yellow);
+    winnerText.setStyle(sf::Text::Bold);
 
     // Load the bullet texture
     if (!bulletTexture.loadFromFile("bullet.png")) {
@@ -147,7 +152,7 @@ void Game::processEvents() {
         float overlapPercentage = calculateOverlapPercentage(tankBounds, muroBounds);
 
         // Si el tanque tiene un solapamiento del 12% o más, restaurarlo a su última posición sin colisión
-        if (overlapPercentage >= 12.0f) {
+        if (overlapPercentage >= 20.0f) {
             player.sprite.setPosition(lastValidPosition);
         }
     };
@@ -184,26 +189,41 @@ void Game::processEvents() {
 
 // Renderizado de la escena del juego
 void Game::render() {
+    
     window.clear();
-    player1->draw(window);
-    player2->draw(window);
 
-    for (const auto& wall : destructibleWalls) {
-        wall.draw(window);
-    }
+    if (gameOver) {
+        // Mostrar el mensaje del ganador
+        window.draw(winnerText);
+    } else {
+        // ... código existente para dibujar el juego ...
+        window.draw(player1->sprite);
+        window.draw(player2->sprite);
 
-    for (const auto& wall : walls) {
-        wall.draw(window);
-    }
-
-    for (auto& bullet : bullets) {
-        if (bullet.isActive) {
-            bullet.draw(window);
+        // Dibujar balas
+        for (const auto &bullet : bullets) {
+            if (bullet.isActive) {
+                window.draw(bullet.sprite);
+            }
         }
+
+        // Dibujar paredes
+        // Dibujar paredes
+        for (const auto &wall : walls) {
+            wall.draw(window);
+}
+
+// Dibujar muros destructibles
+        for (const auto &destructibleWall : destructibleWalls) {
+            if (!destructibleWall.isDestroyed()) {
+                 destructibleWall.draw(window);
     }
+}
+}
 
     window.display();
 }
+
 
 // Disparar balas
 void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
@@ -241,6 +261,15 @@ void Game::run() {
     }
 }
 void Game::update() {
+
+    if (gameOver) {
+        // Verificar si han pasado 5 segundos
+        if (gameOverClock.getElapsedTime().asSeconds() >= 5.0f) {
+            window.close(); // Cerrar la ventana del juego
+        }
+        return; // No continuar actualizando el juego
+    }
+
     for (auto& bullet : bullets) {
         if (!bullet.isActive) continue;
 
@@ -297,7 +326,7 @@ void Game::update() {
             std::cout << "Jugador 2 ha recibido un impacto, vidas restantes: " << player2->vidas << std::endl;
             bullet.isActive = false;
             }
-
+        
 
     }
 
@@ -313,5 +342,29 @@ void Game::update() {
         player2Bullets++;
         reloadClockPlayer2.restart();
     }
+   if (player1->estaDestruido() || player2->estaDestruido()) {
+    if (!gameOver) { // Solo ejecutar una vez
+        gameOver = true;
+        gameOverClock.restart(); // Reiniciar el reloj para contar los 5 segundos
+
+        // Determinar quién ganó
+        if (player1->estaDestruido() && !player2->estaDestruido()) {
+            winnerText.setString("¡Jugador 2 Gana!");
+        } else if (!player1->estaDestruido() && player2->estaDestruido()) {
+            winnerText.setString("¡Jugador 1 Gana!");
+        } else {
+            winnerText.setString("¡Empate!");
+        }
+
+        // Centrar el texto en la pantalla
+        sf::FloatRect textRect = winnerText.getLocalBounds();
+        winnerText.setOrigin(textRect.left + textRect.width / 2.0f,
+                             textRect.top + textRect.height / 2.0f);
+        winnerText.setPosition(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
+
+        // Detener cualquier música o sonidos si es necesario
+    }
+}
+
 }
 

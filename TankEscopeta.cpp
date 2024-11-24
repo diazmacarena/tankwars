@@ -4,16 +4,15 @@
 #include <cmath>
 
 // Constructor de TankEscopeta
+#include "TankEscopeta.h"
+#include <iostream>
+
 TankEscopeta::TankEscopeta(const std::string& textureFile, float initialX, float initialY)
     : Tank(textureFile, initialX, initialY), cartucho(4, 15.0f) {
+    speed = 1.0f; // Aseguramos que la velocidad sea la misma que la del tanque base
     std::cout << "TankEscopeta creado correctamente con la textura " << textureFile << std::endl;
 }
 
-
-
-
-
-// Método para disparar proyectiles
 void TankEscopeta::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
                          const float shootInterval, const float reloadTime, sf::Clock &reloadClock) {
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval && cartucho.getBalasRestantes() > 0) {
@@ -22,7 +21,6 @@ void TankEscopeta::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, in
 
         if (cartucho.disparar(direcciones, baseAngle)) {
             for (const auto &direccion : direcciones) {
-                // Use bulletTexture instead of "bullet.png"
                 bullets.emplace_back(*bulletTexture, sprite.getPosition().x, sprite.getPosition().y, direccion, this);
             }
             shootClock.restart();
@@ -30,6 +28,7 @@ void TankEscopeta::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, in
         }
     }
 }
+
 
 
 
