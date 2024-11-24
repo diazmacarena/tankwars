@@ -1,4 +1,6 @@
 #include "Tank.h"
+#include "Bullet.h"
+#include <cmath>
 
 
 // Constructor por defecto
@@ -62,4 +64,20 @@ bool Tank::estaDestruido() const {
 
 void Tank::ocultar() {
     sprite.setPosition(-1000, -1000);
+}
+
+float Tank::degreesToRadians(float degrees) {
+    return degrees * (3.14159265f / 180.0f);
+}
+
+void Tank::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
+                 const float shootInterval, const float reloadTime, sf::Clock &reloadClock) {
+    if (shootClock.getElapsedTime().asSeconds() >= shootInterval && bulletCount > 0) {
+        float angleRadians = degreesToRadians(sprite.getRotation());
+        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
+        bullets.emplace_back("bullet.png", sprite.getPosition().x, sprite.getPosition().y, direction, this);
+        bulletCount--;
+        shootClock.restart();
+        reloadClock.restart();
+    }
 }

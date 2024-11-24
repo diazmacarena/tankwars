@@ -109,7 +109,7 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
 
         // Mostrar tanque seleccionado para jugador 1
         sf::Text player1Text(
-            "Jugador 1 (WASD): " + std::string(player1TankType == 0 ? "TankEscopeta" : "Tank"),
+            "Jugador 1 (WASD): " + std::string(player1TankType == 0 ? "Tank" : "Tank Escopetin"),
             font, 40);
         player1Text.setPosition(300, 500);
         player1Text.setFillColor(sf::Color::White);
@@ -117,7 +117,7 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
 
         // Mostrar tanque seleccionado para jugador 2
         sf::Text player2Text(
-            "Jugador 2 (Flechas): " + std::string(player2TankType == 0 ? "TankEscopeta" : "Tank"),
+            "Jugador 2 (Flechas): " + std::string(player2TankType == 0 ? "Tank" : "TankEscopetin"),
             font, 40);
         player2Text.setPosition(300, 600);
         player2Text.setFillColor(sf::Color::White);

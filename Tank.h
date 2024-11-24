@@ -2,7 +2,10 @@
 #define TANK_H
 
 #include <SFML/Graphics.hpp>
+#include <cmath>
 #include <iostream>
+#include <string>
+class Bullet;
 
 class Tank {
 public:
@@ -24,10 +27,16 @@ public:
     // Método virtual para restar vida
     virtual void restarVida();
 
+    virtual void shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock,
+                         int &bulletCount, const float shootInterval, 
+                         const float reloadTime, sf::Clock &reloadClock);
+
     // Verificar si el tanque ha sido destruido
     bool estaDestruido() const;
 
     void ocultar();
+protected:
+    static float degreesToRadians(float degres);
 };
 
 #endif

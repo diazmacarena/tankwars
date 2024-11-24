@@ -12,57 +12,38 @@ const int TILE_SIZE = 40;
 #include <fstream>
 #include <iostream>
 
-// Constructor predeterminado para 2 jugadores (1 Tank, 1 Tank)
-Game::Game()
-    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
-      player1("Tank1.png", 200, 150),
-      player2("Tank2.png", 1600, 800),
-      player3("Tank3.png", 400, 300),  // Inicializamos player3 y player4 con valores predeterminados
-      player4("Tank4.png", 1400, 700) {
-    cargarNivel(mapFile);
-}
-
-// Constructor para 2 jugadores (1 Tank, 1 Tank)
-Game::Game(const std::string& nivel)
-    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
-      player1("Tank1.png", 200, 150),
-      player2("Tank2.png", 1600, 800),
-      player3("Tank3.png", 400, 300),
-      player4("Tank4.png", 1400, 700) {
-    cargarNivel(nivel);
-}
-
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
-    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"),
-      player1("Tank1.png", 200, 150),
-      player2("Tank2.png", 1600, 800),
-      player3("Tank3.png", 400, 300),  // Valores predeterminados para TankEscopeta
-      player4("Tank4.png", 1400, 700) {
+    : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer") {
     switch (playersType) {
         case 1: // Tank vs Tank
-            player1 = Tank("Tank1.png", 200, 150);
-            player2 = Tank("Tank2.png", 1600, 800);
+            player1 = new Tank("Tank1.png", 200, 150);
+            player2 = new Tank("Tank2.png", 1600, 800);
             break;
         case 2: // Tank vs TankEscopeta
-            player1 = Tank("Tank1.png", 200, 150);
-            player4 = TankEscopeta("Tank4.png", 1400, 700);
+            player1 = new Tank("Tank1.png", 200, 150);
+            player2 = new TankEscopeta("Tank2.png", 1600, 800);
             break;
         case 3: // TankEscopeta vs Tank
-            player3 = TankEscopeta("Tank3.png", 400, 300);
-            player2 = Tank("Tank2.png", 1600, 800);
+            player1 = new TankEscopeta("Tank1.png", 200, 150);
+            player2 = new Tank("Tank2.png", 1600, 800);
             break;
         case 4: // TankEscopeta vs TankEscopeta
-            player3 = TankEscopeta("Tank3.png", 400, 300);
-            player4 = TankEscopeta("Tank4.png", 1400, 700);
+            player1 = new TankEscopeta("Tank1.png", 200, 150);
+            player2 = new TankEscopeta("Tank2.png", 1600, 800);
             break;
         default:
             std::cerr << "Tipo de jugadores no válido. Usando configuración predeterminada (1 Tank, 1 TankEscopeta).\n";
-            player1 = Tank("Tank1.png", 200, 150);
-            player4 = TankEscopeta("Tank4.png", 1400, 700);
+            player1 = new Tank("Tank1.png", 200, 150);
+            player2 = new TankEscopeta("Tank2.png", 1600, 800);
             break;
     }
     cargarNivel(nivel);
+}
+
+Game::~Game(){
+    delete player1;
+    delete player2;
 }
 
 float Game::degreesToRadians(float degrees) {
@@ -103,28 +84,28 @@ void Game::processEvents() {
 
     // Control del jugador 1
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) 
-        moverTanque(player1, movementSpeed, lastValidPositionPlayer1);
+        moverTanque(*player1, movementSpeed, lastValidPositionPlayer1);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) 
-        moverTanque(player1, -movementSpeed, lastValidPositionPlayer1);
+        moverTanque(*player1, -movementSpeed, lastValidPositionPlayer1);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) 
-        player1.rotate(-rotationSpeed);
+        player1->rotate(-rotationSpeed);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
-        player1.rotate(rotationSpeed);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && shootClockPlayer1.getElapsedTime().asSeconds() >= shootInterval) {
-        shootBullet(player1, player1Bullets, shootClockPlayer1, reloadClockPlayer1);
+        player1->rotate(rotationSpeed);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+        player1->shoot(bullets, shootClockPlayer1, player1Bullets, shootInterval, reloadTime, reloadClockPlayer1);
     }
 
     // Control del jugador 2
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) 
-        moverTanque(player2, movementSpeed, lastValidPositionPlayer2);
+        moverTanque(*player2, movementSpeed, lastValidPositionPlayer2);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        moverTanque(player2, -movementSpeed, lastValidPositionPlayer2);
+        moverTanque(*player2, -movementSpeed, lastValidPositionPlayer2);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        player2.rotate(-rotationSpeed);
+        player2->rotate(-rotationSpeed);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
-        player2.rotate(rotationSpeed);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && shootClockPlayer2.getElapsedTime().asSeconds() >= shootInterval) {
-        shootBullet(player2, player2Bullets, shootClockPlayer2, reloadClockPlayer2);
+        player2->rotate(rotationSpeed);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+        player2->shoot(bullets, shootClockPlayer2, player2Bullets, shootInterval, reloadTime, reloadClockPlayer2);
     }
 }
 
@@ -193,8 +174,8 @@ void Game::processEvents() {
 // Renderizado de la escena del juego
 void Game::render() {
     window.clear();
-    player1.draw(window);
-    player2.draw(window);
+    player1->draw(window);
+    player2->draw(window);
 
     for (const auto& wall : destructibleWalls) {
         wall.draw(window);
@@ -224,16 +205,6 @@ void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf
         bulletCount--;
         shootClock.restart();
         reloadClock.restart();
-    }
-}
-void Game::shootEscopeta(TankEscopeta &player, sf::Clock &shootClock) {
-    std::vector<sf::Vector2f> direcciones;
-    if (player.getBalasRestantes() > 0) {
-        player.disparar(direcciones);
-        for (const auto &direccion : direcciones) {
-            bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direccion, &player);
-        }
-        shootClock.restart();
     }
 }
 // Dibuja las vidas de los tanques
@@ -304,26 +275,19 @@ void Game::update() {
         }
 
         // Verificar colisiones con los tanques y restar vidas
-        if (bullet.checkCollision(player1.sprite)) {
-            player1.restarVida();
-            std::cout << "Jugador 1 ha recibido un impacto, vidas restantes: " << player1.vidas << std::endl;
+        // Verificar colisiones con los tanques y restar vidas
+        if (bullet.checkCollision(player1->sprite)) {
+            player1->restarVida();
+            std::cout << "Jugador 1 ha recibido un impacto, vidas restantes: " << player1->vidas << std::endl;
             bullet.isActive = false;
         }
-        if (bullet.checkCollision(player2.sprite)) {
-            player2.restarVida();
-            std::cout << "Jugador 2 ha recibido un impacto, vidas restantes: " << player2.vidas << std::endl;
+        if (bullet.checkCollision(player2->sprite)) {
+            player2->restarVida();
+            std::cout << "Jugador 2 ha recibido un impacto, vidas restantes: " << player2->vidas << std::endl;
             bullet.isActive = false;
-        }
+            }
 
-        // Verificar si algún jugador ha sido destruido y restaurar su vida
-        if (player1.estaDestruido()) {
-            std::cout << "Jugador 1 ha sido destruido. Reviviendo..." << std::endl;
-            player1.vidas = 3;
-        }
-        if (player2.estaDestruido()) {
-            std::cout << "Jugador 2 ha sido destruido. Reviviendo..." << std::endl;
-            player2.vidas = 3;
-        }
+
     }
 
     // Eliminar las balas inactivas

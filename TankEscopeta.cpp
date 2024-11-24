@@ -1,5 +1,7 @@
 #include "TankEscopeta.h"
+#include "Bullet.h"
 #include <iostream>
+#include <cmath>
 
 // Constructor de TankEscopeta
 TankEscopeta::TankEscopeta(const std::string& textureFile, float initialX, float initialY)
@@ -10,16 +12,26 @@ TankEscopeta::TankEscopeta(const std::string& textureFile, float initialX, float
 
 
 
+
 // Método para disparar proyectiles
-void TankEscopeta::disparar(std::vector<sf::Vector2f>& direcciones) {
-    if (cartucho.disparar(direcciones)) {
-        std::cout << "Disparando proyectiles dispersos...\n";
-    } else {
-        std::cout << "Sin balas en el cartucho.\n";
+void TankEscopeta::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
+                         const float shootInterval, const float reloadTime, sf::Clock &reloadClock) {
+    if (shootClock.getElapsedTime().asSeconds() >= shootInterval && cartucho.getBalasRestantes() > 0) {
+        float baseAngle = sprite.getRotation();
+        std::vector<sf::Vector2f> direcciones;
+        if (cartucho.disparar(direcciones, baseAngle)) {
+            for (const auto &direccion : direcciones) {
+                bullets.emplace_back("bullet.png", sprite.getPosition().x, sprite.getPosition().y, direccion, this);
+            }
+            shootClock.restart();
+            reloadClock.restart();
+        }
     }
 }
+
 
 // Método para obtener las balas restantes
 int TankEscopeta::getBalasRestantes() const {
     return cartucho.getBalasRestantes();
 }
+

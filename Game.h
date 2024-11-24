@@ -14,10 +14,8 @@
 class Game {
 private:
     sf::RenderWindow window;
-    Tank player1;
-    Tank player2;
-    TankEscopeta player3;
-    TankEscopeta player4;
+    Tank* player1;
+    Tank* player2;
     std::vector<Bullet> bullets;
     std::string mapFile;
     sf::Texture bulletTexture;
@@ -52,11 +50,10 @@ private:
 
     void cargarNivel(const std::string& filename);
 
-public:
-    Game();                             // 2 jugadores (1 Tank, 1 Tank)
-    Game(const std::string& mapFile);  // 2 jugadores (1 Tank, 1 Tank)
+public:  // 2 jugadores (1 Tank, 1 Tank)
     Game(int playersType, const std::string&mapFile);             // Para manejar combinaciones específicas
     void run();
+    ~Game();
 };
 
 #endif // GAME_H

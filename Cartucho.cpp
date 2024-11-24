@@ -1,26 +1,30 @@
 #include "Cartucho.h"
 #include <cmath>
 
-// Constructor por defecto
-Cartucho::Cartucho(int balas, float dispersion) : balasRestantes(balas), dispersión(dispersion) {}
+Cartucho::Cartucho(int balas, float dispersion)
+    : balasRestantes(balas), dispersion(dispersion) {}
 
-// Método para disparar y generar direcciones de proyectiles
-bool Cartucho::disparar(std::vector<sf::Vector2f>& direcciones) {
-    if (balasRestantes > 0) {
-        float angleStep = dispersión / 3; // Separa los proyectiles en un rango uniforme
-        for (int i = -1; i <= 1; i++) {
-            float angle = i * angleStep;
-            float radianes = angle * (3.14159f / 180.0f);
-            direcciones.push_back(sf::Vector2f(cos(radianes), sin(radianes)));
-        }
-        direcciones.push_back(sf::Vector2f(1, 0)); // Dirección central
-        balasRestantes--;
-        return true;
+
+bool Cartucho::disparar(std::vector<sf::Vector2f>& direcciones, float baseAngle) {
+    if (balasRestantes <= 0) {
+        return false;
     }
-    return false;
+    balasRestantes--;
+
+    int numProjectiles = 5; // Número de proyectiles por disparo
+    float angleStep = dispersion / (numProjectiles - 1);
+
+    for (int i = 0; i < numProjectiles; ++i) {
+        float angle = baseAngle - (dispersion / 2) + i * angleStep;
+        float radianAngle = angle * (3.14159265f / 180.0f);
+        sf::Vector2f direction(std::cos(radianAngle), std::sin(radianAngle));
+        direcciones.push_back(direction);
+    }
+
+    return true;
 }
 
-// Getter para obtener las balas restantes
+
 int Cartucho::getBalasRestantes() const {
     return balasRestantes;
 }

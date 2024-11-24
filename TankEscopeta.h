@@ -5,6 +5,8 @@
 #include "Cartucho.h"
 #include <vector>
 
+class Bullet;
+
 class TankEscopeta : public Tank {
 private:
     Cartucho cartucho; // Contiene las balas y comportamiento de disparo
@@ -12,7 +14,8 @@ private:
 public:
     TankEscopeta(const std::string& textureFile, float initialX, float initialY);
 
-    void disparar(std::vector<sf::Vector2f>& direcciones); // Método para disparar balas
+   void shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
+               const float shootInterval, const float reloadTime, sf::Clock &reloadClock) override; // Método para disparar balas
     int getBalasRestantes() const; // Método para consultar las balas restantes
 };
 

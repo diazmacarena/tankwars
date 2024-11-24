@@ -4,7 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cmath>
-#include "Tank.h"
+#include <string>
+
+class Tank;
 
 class Bullet {
 public:

@@ -6,12 +6,13 @@
 
 class Cartucho {
 private:
-    int balasRestantes;  // Número de balas que tiene el cartucho
-    float dispersión;    // Ángulo de dispersión de los proyectiles
+    int balasRestantes;
+    float dispersion;
 
 public:
-    Cartucho(int balas = 4, float dispersion = 15.0f); // Constructor por defecto
-    bool disparar(std::vector<sf::Vector2f>& direcciones); // Genera direcciones de disparo
+    Cartucho(int balas = 4, float dispersion = 15.0f);
+    bool disparar(std::vector<sf::Vector2f>& direcciones, float baseAngle);
+
     int getBalasRestantes() const;
 };
 
