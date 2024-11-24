@@ -18,9 +18,7 @@ public:
     Tank* owner;         // Puntero al tanque que disparó la bala
 
     // Declaración del constructor
-    Bullet(const std::string& textureFile, float startX, float startY, sf::Vector2f direction, Tank* shooter);
-
-    // Movimiento de la bala
+    Bullet(const sf::Texture& texture, float startX, float startY, sf::Vector2f direction, Tank* shooter);    // Movimiento de la bala
     void update();
 
     // Dibujar la bala

@@ -2,27 +2,23 @@
 #include "Tank.h"
 
 // Constructor de la clase Bullet
-Bullet::Bullet(const std::string& textureFile, float startX, float startY, sf::Vector2f direction, Tank* shooter)
+Bullet::Bullet(const sf::Texture& texture, float startX, float startY, sf::Vector2f direction, Tank* shooter)
     : isActive(true), collisionCount(0), owner(shooter) {
-    if (!texture.loadFromFile(textureFile)) {
-        std::cerr << "Error: No se pudo cargar la textura de la bala " << textureFile << std::endl;
-    }
     sprite.setTexture(texture);
-    sprite.setScale(0.07f, 0.07f);  // Cambiar los factores de escala
-    // Posicionar la bala en el cañón (a la derecha del tanque, centrado verticalmente)
-    float angle = shooter->sprite.getRotation() * 3.1416f / 180.0f;  // Convierte grados a radianes
-    float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2.5);  // Posicionar a la derecha del tanque
-    float yOffset = std::sin(angle) * (shooter->sprite.getLocalBounds().height / 2.5); // Centrar en la mitad vertical
-    sprite.setPosition(startX + xOffset, startY + yOffset );
+    sprite.setScale(0.07f, 0.07f);
 
-    // Normalizar la dirección y multiplicar por la velocidad
+    float angle = shooter->sprite.getRotation() * 3.1416f / 180.0f;
+    float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2.5f);
+    float yOffset = std::sin(angle) * (shooter->sprite.getLocalBounds().height / 2.5f);
+    sprite.setPosition(startX + xOffset, startY + yOffset);
+
+    // Normalize direction and set velocity
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length != 0) {
-        direction /= length;  // Normalize
+        direction /= length;
     }
-    velocity = direction * 1.1f;  // Velocidad de la bala
+    velocity = direction * 1.1f;
 }
-
 // Movimiento de la bala
 void Bullet::update() {
     if (isActive) {

@@ -35,8 +35,11 @@ public:
     bool estaDestruido() const;
 
     void ocultar();
+
+    void setBulletTexture(const sf::Texture& texture);
 protected:
     static float degreesToRadians(float degres);
+    const sf::Texture* bulletTexture;
 };
 
 #endif

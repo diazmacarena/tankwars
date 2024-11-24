@@ -15,6 +15,7 @@ const int TILE_SIZE = 40;
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer") {
+    // Initialize players based on playersType
     switch (playersType) {
         case 1: // Tank vs Tank
             player1 = new Tank("Tank1.png", 200, 150);
@@ -38,6 +39,16 @@ Game::Game(int playersType, const std::string& nivel)
             player2 = new TankEscopeta("Tank2.png", 1600, 800);
             break;
     }
+
+    // Load the bullet texture
+    if (!bulletTexture.loadFromFile("bullet.png")) {
+        std::cerr << "Error: No se pudo cargar la textura de la bala bullet.png" << std::endl;
+    }
+
+    // Set the bullet texture for the tanks
+    player1->setBulletTexture(bulletTexture);
+    player2->setBulletTexture(bulletTexture);
+
     cargarNivel(nivel);
 }
 
@@ -200,7 +211,7 @@ void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf
         float angleRadians = degreesToRadians(player.sprite.getRotation());
         sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
 
-        bullets.emplace_back("bullet.png", player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
+        bullets.emplace_back(bulletTexture, player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
 
         bulletCount--;
         shootClock.restart();

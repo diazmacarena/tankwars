@@ -19,15 +19,18 @@ void TankEscopeta::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, in
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval && cartucho.getBalasRestantes() > 0) {
         float baseAngle = sprite.getRotation();
         std::vector<sf::Vector2f> direcciones;
+
         if (cartucho.disparar(direcciones, baseAngle)) {
             for (const auto &direccion : direcciones) {
-                bullets.emplace_back("bullet.png", sprite.getPosition().x, sprite.getPosition().y, direccion, this);
+                // Use bulletTexture instead of "bullet.png"
+                bullets.emplace_back(*bulletTexture, sprite.getPosition().x, sprite.getPosition().y, direccion, this);
             }
             shootClock.restart();
             reloadClock.restart();
         }
     }
 }
+
 
 
 // Método para obtener las balas restantes

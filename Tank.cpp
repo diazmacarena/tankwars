@@ -75,9 +75,20 @@ void Tank::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulle
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval && bulletCount > 0) {
         float angleRadians = degreesToRadians(sprite.getRotation());
         sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
-        bullets.emplace_back("bullet.png", sprite.getPosition().x, sprite.getPosition().y, direction, this);
+
+        // Use bulletTexture instead of "bullet.png"
+        bullets.emplace_back(*bulletTexture, sprite.getPosition().x, sprite.getPosition().y, direction, this);
+
         bulletCount--;
         shootClock.restart();
         reloadClock.restart();
     }
 }
+
+
+
+
+void Tank::setBulletTexture(const sf::Texture& texture) {
+    bulletTexture = &texture;
+}
+
