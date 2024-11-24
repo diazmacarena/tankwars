@@ -1,9 +1,15 @@
 #include "GameInterface.h"
 #include <string>
 
+#include "GameInterface.h"
+#include <string>
+#include <iostream>  // Para std::cerr
+
 GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2TankType(0) {
     // Carga de la fuente
-    font.loadFromFile("Extra Days.ttf");
+    if (!font.loadFromFile("Extra Days.ttf")) {
+        std::cerr << "Error al cargar la fuente Extra Days.ttf\n";
+    }
 
     // Opciones del menú
     std::vector<std::string> options = {"Seleccion de niveles", "Como se juega", "Salir"};
@@ -13,7 +19,30 @@ GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2Ta
         text.setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
         menuOptions.push_back(text);
     }
+
+    // Cargar los sonidos
+    if (!moveBuffer.loadFromFile("move_interface.wav")) {
+        std::cerr << "Error al cargar move_interface.wav\n";
+    } else {
+        moveSound.setBuffer(moveBuffer);
+        moveSound.setVolume(50); // Ajustar volumen si es necesario
+    }
+
+    if (!selectBuffer.loadFromFile("select.wav")) {
+        std::cerr << "Error al cargar select.wav\n";
+    } else {
+        selectSound.setBuffer(selectBuffer);
+        selectSound.setVolume(50);
+    }
+
+    if (!gameStartBuffer.loadFromFile("game_start.wav")) {
+        std::cerr << "Error al cargar game_start.wav\n";
+    } else {
+        gameStartSound.setBuffer(gameStartBuffer);
+        gameStartSound.setVolume(70);
+    }
 }
+
 
 void GameInterface::run() {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "TankWars Menu");
@@ -40,11 +69,25 @@ void GameInterface::handleEvents(sf::RenderWindow &window) {
             window.close();
         } else if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Up) {
+                int previousOption = currentOption;
                 currentOption = (currentOption - 1 + menuOptions.size()) % menuOptions.size();
+                if (currentOption != previousOption) {
+                    // Reproducir sonido de movimiento
+                    moveSound.play();
+                }
             } else if (event.key.code == sf::Keyboard::Down) {
+                int previousOption = currentOption;
                 currentOption = (currentOption + 1) % menuOptions.size();
+                if (currentOption != previousOption) {
+                    // Reproducir sonido de movimiento
+                    moveSound.play();
+                }
             } else if (event.key.code == sf::Keyboard::Enter) {
+                // Reproducir sonido de selección
+                selectSound.play();
                 if (currentOption == 0) {
+                    // Reproducir sonido de inicio del juego
+                    gameStartSound.play();
                     selectLevel(window);
                 } else if (currentOption == 1) {
                     showInstructions(window);
@@ -56,6 +99,7 @@ void GameInterface::handleEvents(sf::RenderWindow &window) {
     }
 }
 
+
 void GameInterface::selectLevel(sf::RenderWindow &window) {
     int level = 1;
 
@@ -65,19 +109,23 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             } else if (event.type == sf::Event::KeyPressed) {
+                bool moved = false; // Bandera para verificar si se debe reproducir el sonido de movimiento
                 if (event.key.code == sf::Keyboard::Down) {
                     level = (level > 1) ? level - 1 : 10;
+                    moved = true;
                 } else if (event.key.code == sf::Keyboard::Up) {
                     level = (level < 10) ? level + 1 : 1;
-                } else if (event.key.code == sf::Keyboard::Left) {
+                    moved = true;
+                } else if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right) {
                     player2TankType = (player2TankType == 0) ? 1 : 0; // Cambiar tanque del jugador 2
-                } else if (event.key.code == sf::Keyboard::Right) {
-                    player2TankType = (player2TankType == 0) ? 1 : 0; // Cambiar tanque del jugador 2
-                } else if (event.key.code == sf::Keyboard::A) {
+                    moved = true;
+                } else if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::D) {
                     player1TankType = (player1TankType == 0) ? 1 : 0; // Cambiar tanque del jugador 1
-                } else if (event.key.code == sf::Keyboard::D) {
-                    player1TankType = (player1TankType == 0) ? 1 : 0; // Cambiar tanque del jugador 1
+                    moved = true;
                 } else if (event.key.code == sf::Keyboard::Enter) {
+                    // Reproducir sonido de selección
+                    selectSound.play();
+
                     std::string mapFile = "nivel" + std::to_string(level) + ".txt";
 
                     // Configurar los tipos de tanque según las selecciones
@@ -95,6 +143,11 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
                     Game juego(playersType, mapFile);
                     juego.run();
                     return;
+                }
+
+                if (moved) {
+                    // Reproducir sonido de movimiento
+                    moveSound.play();
                 }
             }
         }
@@ -117,9 +170,9 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
 
         // Mostrar tanque seleccionado para jugador 2
         sf::Text player2Text(
-            "Jugador 2 (Flechas): " + std::string(player2TankType == 0 ? "Tank" : "TankEscopetin"),
+            "Jugador 2 (Flechas): " + std::string(player2TankType == 0 ? "Tank" : "Tank Escopetin"),
             font, 40);
-        player2Text.setPosition(300, 600);
+        player2Text.setPosition(300, 900);
         player2Text.setFillColor(sf::Color::White);
         window.draw(player2Text);
 
@@ -134,6 +187,8 @@ void GameInterface::showInstructions(sf::RenderWindow &window) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+                // Reproducir sonido de selección
+                selectSound.play();
                 return;
             }
         }
@@ -146,7 +201,7 @@ void GameInterface::showInstructions(sf::RenderWindow &window) {
         window.draw(instructionsText1);
 
         sf::Text instructionsText2("Tanque 2: Usa las flechas para moverse", font, 30);
-        instructionsText2.setPosition(500, 200);
+        instructionsText2.setPosition(500, 400);
         instructionsText2.setFillColor(sf::Color::White);
         window.draw(instructionsText2);
 

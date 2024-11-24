@@ -2,6 +2,7 @@
 #define GAME_INTERFACE_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>  // Incluir SFML Audio
 #include <vector>
 #include <string>
 #include "Game.h"
@@ -25,6 +26,14 @@ private:
 
     int player1TankType; // Tipo de tanque del jugador 1: 0 = Tank, 1 = TankEscopeta
     int player2TankType; // Tipo de tanque del jugador 2: 0 = Tank, 1 = TankEscopeta
+
+    // Sonidos
+    sf::SoundBuffer moveBuffer;
+    sf::Sound moveSound;
+    sf::SoundBuffer selectBuffer;
+    sf::Sound selectSound;
+    sf::SoundBuffer gameStartBuffer;
+    sf::Sound gameStartSound;
 };
 
 #endif // GAME_INTERFACE_H

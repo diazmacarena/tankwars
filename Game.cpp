@@ -5,7 +5,6 @@
 
 // Tamaño de cada celda en el laberinto
 const int TILE_SIZE = 40;
-
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), gameOver(false)  {
@@ -50,12 +49,51 @@ Game::Game(int playersType, const std::string& nivel)
         std::cerr << "Error: No se pudo cargar la textura de la bala bullet.png" << std::endl;
     }
 
+    // Cargar la música de fondo
+    if (!backgroundMusic.openFromFile("Musica-de-fondo.ogg")) {
+        std::cerr << "Error: No se pudo cargar Musica-de-fondo.ogg" << std::endl;
+    } else {
+        backgroundMusic.setLoop(true); // Hacer que la música se repita
+        backgroundMusic.play();
+        backgroundMusic.setVolume(15); // Bajar el volumen de la música de fondo
+    }
+
+    // Cargar el sonido de victoria
+    if (!winBuffer.loadFromFile("win.wav")) {
+        std::cerr << "Error: No se pudo cargar win.wav" << std::endl;
+    } else {
+        winSound.setBuffer(winBuffer);
+        winSound.setVolume(100); // Priorizar el sonido de victoria
+    }
+
+    // Cargar los sonidos de daño y destrucción
+    if (!takeDamageBuffer.loadFromFile("take_damage.wav")) {
+        std::cerr << "Error: No se pudo cargar take_damage.wav" << std::endl;
+    }
+
+    if (!destructionBuffer.loadFromFile("tank_destruction.wav")) {
+        std::cerr << "Error: No se pudo cargar tank_destruction.wav" << std::endl;
+    }
+    if (!bulletHitBuffer.loadFromFile("bullet_hit.wav")) {
+        std::cerr << "Error: No se pudo cargar bullet_hit.wav" << std::endl;
+    } else {
+        bulletHitSound.setBuffer(bulletHitBuffer);
+        bulletHitSound.setVolume(70); // Ajusta el volumen si lo deseas
+    }
+    // Asignar los sonidos a los tanques
+    player1->setTakeDamageSound(takeDamageBuffer);
+    player1->setDestructionSound(destructionBuffer);
+
+    player2->setTakeDamageSound(takeDamageBuffer);
+    player2->setDestructionSound(destructionBuffer);
+
     // Set the bullet texture for the tanks
     player1->setBulletTexture(bulletTexture);
     player2->setBulletTexture(bulletTexture);
 
     cargarNivel(nivel);
 }
+
 
 Game::~Game(){
     delete player1;
@@ -125,7 +163,7 @@ void Game::processEvents() {
     }
 }
 
-    void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPosition) {
+void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPosition) {
     float angleRadians = degreesToRadians(player.sprite.getRotation());
     float dx = std::cos(angleRadians) * speed;
     float dy = std::sin(angleRadians) * speed;
@@ -261,10 +299,9 @@ void Game::run() {
     }
 }
 void Game::update() {
-
     if (gameOver) {
-        // Verificar si han pasado 5 segundos
-        if (gameOverClock.getElapsedTime().asSeconds() >= 5.0f) {
+        // Verificar si han pasado 4 segundos
+        if (gameOverClock.getElapsedTime().asSeconds() >= 4.0f) {
             window.close(); // Cerrar la ventana del juego
         }
         return; // No continuar actualizando el juego
@@ -280,7 +317,11 @@ void Game::update() {
             // Solo verificar colisión si el muro no está destruido
             if (!wall.isDestroyed() && bullet.sprite.getGlobalBounds().intersects(wall.getBounds())) {
                 wall.hit();  // Destruir el muro destructible
-                bullet.isActive = false;  // Desactivar la bala
+                bullet.isActive = false;
+                if (bulletHitSound.getStatus() == sf::Sound::Playing) {
+                    bulletHitSound.stop();
+                    }
+                bulletHitSound.play();  // Desactivar la bala
                 break;  // Salir del bucle tras manejar la colisión
             }
         }
@@ -303,7 +344,10 @@ void Game::update() {
                 } else {
                     bullet.velocity.y = -bullet.velocity.y;  // Rebote vertical
                 }
-
+                if (bulletHitSound.getStatus() == sf::Sound::Playing) {
+                    bulletHitSound.stop();
+                    }
+                bulletHitSound.play();
                 bullet.collisionCount++;
                 break;  // Salir del bucle tras manejar la colisión
             }
@@ -342,29 +386,33 @@ void Game::update() {
         player2Bullets++;
         reloadClockPlayer2.restart();
     }
-   if (player1->estaDestruido() || player2->estaDestruido()) {
-    if (!gameOver) { // Solo ejecutar una vez
-        gameOver = true;
-        gameOverClock.restart(); // Reiniciar el reloj para contar los 5 segundos
+    if (player1->estaDestruido() || player2->estaDestruido()) {
+        if (!gameOver) { // Solo ejecutar una vez
+            gameOver = true;
+            gameOverClock.restart(); // Reiniciar el reloj para contar los 5 segundos
 
-        // Determinar quién ganó
-        if (player1->estaDestruido() && !player2->estaDestruido()) {
-            winnerText.setString("¡Jugador 2 Gana!");
-        } else if (!player1->estaDestruido() && player2->estaDestruido()) {
-            winnerText.setString("¡Jugador 1 Gana!");
-        } else {
-            winnerText.setString("¡Empate!");
+            // Detener la música de fondo
+            backgroundMusic.stop();
+
+            // Reproducir sonido de victoria
+            winSound.play();
+
+            // Determinar quién ganó
+            if (player1->estaDestruido() && !player2->estaDestruido()) {
+                winnerText.setString("¡El Jugador 2 Gana!");
+            } else if (!player1->estaDestruido() && player2->estaDestruido()) {
+                winnerText.setString("¡El Jugador 1 Gana!");
+            } else {
+                winnerText.setString("¡Empate!");
+            }
+
+            // Centrar el texto en la pantalla
+            sf::FloatRect textRect = winnerText.getLocalBounds();
+            winnerText.setOrigin(textRect.left + textRect.width / 2.0f,
+                                 textRect.top + textRect.height / 2.0f);
+            winnerText.setPosition(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
         }
-
-        // Centrar el texto en la pantalla
-        sf::FloatRect textRect = winnerText.getLocalBounds();
-        winnerText.setOrigin(textRect.left + textRect.width / 2.0f,
-                             textRect.top + textRect.height / 2.0f);
-        winnerText.setPosition(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
-
-        // Detener cualquier música o sonidos si es necesario
     }
-}
 
 }
 

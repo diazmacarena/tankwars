@@ -2,6 +2,7 @@
 #define TANK_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -28,7 +29,7 @@ public:
     virtual void restarVida();
 
     virtual void shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock,
-                         int &bulletCount, const float shootInterval, 
+                         int &bulletCount, const float shootInterval,
                          const float reloadTime, sf::Clock &reloadClock);
 
     // Verificar si el tanque ha sido destruido
@@ -37,9 +38,14 @@ public:
     void ocultar();
 
     void setBulletTexture(const sf::Texture& texture);
+    void setTakeDamageSound(const sf::SoundBuffer& buffer);
+    void setDestructionSound(const sf::SoundBuffer& buffer);
+
 protected:
     static float degreesToRadians(float degres);
     const sf::Texture* bulletTexture;
+    sf::Sound takeDamageSound;
+    sf::Sound destructionSound;
 };
 
-#endif
+#endif // TANK_H

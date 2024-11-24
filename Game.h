@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Tank.h"
 #include "TankEscopeta.h"
 #include "Bullet.h"
@@ -13,7 +14,6 @@
 
 class Game {
 private:
-
     sf::RenderWindow window;
     Tank* player1;
     Tank* player2;
@@ -22,8 +22,8 @@ private:
     sf::Texture bulletTexture;
 
     // Parámetros de juego
-    const float movementSpeed = 1.0f;
-    const float rotationSpeed = 0.3f;
+    const float movementSpeed = 1.0f;   // Incrementado para mayor velocidad
+    const float rotationSpeed = 0.5f;   // Incrementado para mayor velocidad de rotación
     const float shootInterval = 0.25f;
     const float reloadTime = 1.2f;
     const int maxBullets = 6;
@@ -41,9 +41,19 @@ private:
     std::vector<DestructibleWall> destructibleWalls;
     sf::Vector2f lastValidPositionPlayer1;
     sf::Vector2f lastValidPositionPlayer2;
+
     sf::Font font;
     sf::Text winnerText;
     bool gameOver;
+
+    // Música y sonidos
+    sf::Music backgroundMusic;
+    sf::SoundBuffer winBuffer;
+    sf::Sound winSound;
+    sf::SoundBuffer takeDamageBuffer;
+    sf::SoundBuffer destructionBuffer;
+    sf::SoundBuffer bulletHitBuffer;
+    sf::Sound bulletHitSound;
 
     float degreesToRadians(float degrees);
     void processEvents();
@@ -56,7 +66,7 @@ private:
     void cargarNivel(const std::string& filename);
 
 public:  // 2 jugadores (1 Tank, 1 Tank)
-    Game(int playersType, const std::string&mapFile);             // Para manejar combinaciones específicas
+    Game(int playersType, const std::string& mapFile);             // Para manejar combinaciones específicas
     void run();
     ~Game();
 };

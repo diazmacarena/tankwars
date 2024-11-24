@@ -2,9 +2,8 @@
 #include "Bullet.h"
 #include <cmath>
 
-
 // Constructor por defecto
-Tank::Tank() : vidas(3), speed(0.4f), direction(0, 0) {
+Tank::Tank() : vidas(3), speed(1.0f), direction(0, 0) {
     std::cout << "Tanque creado con valores predeterminados.\n";
     // Opcionalmente podrías cargar una textura predeterminada
     if (!texture.loadFromFile("default_tank.png")) {
@@ -16,8 +15,7 @@ Tank::Tank() : vidas(3), speed(0.4f), direction(0, 0) {
     sprite.setPosition(0, 0);  // Posición inicial predeterminada
 }
 
-
-Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vidas(3) {
+Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vidas(3), speed(1.0f) {
     if (!texture.loadFromFile(textureFile)) {
         std::cerr << "Error: No se pudo cargar la textura " << textureFile << std::endl;
     }
@@ -27,7 +25,6 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
     sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
     sprite.setPosition(initialX, initialY);
 
-    speed = 1.0f;  // Velocidad del tanque
     direction = sf::Vector2f(0, 0);
 }
 
@@ -36,7 +33,8 @@ void Tank::rotate(float angle) {
 }
 
 void Tank::move(float offsetX, float offsetY) {
-    sprite.move(offsetX * speed, offsetY * speed);
+    // No multiplicamos por 'speed' aquí porque ya se aplicó en Game::moverTanque
+    sprite.move(offsetX, offsetY);
     direction.x = offsetX;
     direction.y = offsetY;
 }
@@ -49,14 +47,20 @@ void Tank::restarVida() {
     if (vidas > 0) {
         vidas--;
         std::cout << "Vida del tanque reducida. Vidas restantes: " << vidas << std::endl;
+
+        takeDamageSound.setVolume(50);
+        takeDamageSound.play();
     }
 
     if (vidas == 0) {
         std::cout << "El tanque ha sido destruido." << std::endl;
+
+        destructionSound.setVolume(40);
+        destructionSound.play();
+
         ocultar();
     }
 }
-
 
 bool Tank::estaDestruido() const {
     return vidas <= 0;
@@ -85,10 +89,16 @@ void Tank::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulle
     }
 }
 
+void Tank::setTakeDamageSound(const sf::SoundBuffer& buffer) {
+    takeDamageSound.setBuffer(buffer);
+    takeDamageSound.setVolume(100); // Volumen máximo
+}
 
-
+void Tank::setDestructionSound(const sf::SoundBuffer& buffer) {
+    destructionSound.setBuffer(buffer);
+    destructionSound.setVolume(100); // Volumen máximo
+}
 
 void Tank::setBulletTexture(const sf::Texture& texture) {
     bulletTexture = &texture;
 }
-
