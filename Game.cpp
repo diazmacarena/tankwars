@@ -234,7 +234,6 @@ void Game::render() {
         // Mostrar el mensaje del ganador
         window.draw(winnerText);
     } else {
-        // ... código existente para dibujar el juego ...
         window.draw(player1->sprite);
         window.draw(player2->sprite);
 
@@ -244,8 +243,6 @@ void Game::render() {
                 window.draw(bullet.sprite);
             }
         }
-
-        // Dibujar paredes
         // Dibujar paredes
         for (const auto &wall : walls) {
             wall.draw(window);
@@ -354,7 +351,7 @@ void Game::update() {
         }
 
         // Limitar el número de colisiones
-        if (bullet.collisionCount >= 8) {
+        if (bullet.collisionCount >= 6) {
             bullet.isActive = false;
         }
 
@@ -399,11 +396,11 @@ void Game::update() {
 
             // Determinar quién ganó
             if (player1->estaDestruido() && !player2->estaDestruido()) {
-                winnerText.setString("¡El Jugador 2 Gana!");
+                winnerText.setString("El Jugador 2 Gana");
             } else if (!player1->estaDestruido() && player2->estaDestruido()) {
-                winnerText.setString("¡El Jugador 1 Gana!");
+                winnerText.setString("El Jugador 1 Gana");
             } else {
-                winnerText.setString("¡Empate!");
+                winnerText.setString("Empate");
             }
 
             // Centrar el texto en la pantalla

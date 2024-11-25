@@ -7,12 +7,12 @@ Bullet::Bullet(const sf::Texture& texture, float startX, float startY, sf::Vecto
     sprite.setTexture(texture);
     sprite.setScale(0.07f, 0.07f);
 
-    float angle = shooter->sprite.getRotation() * 3.1416f / 180.0f;
+    float angle = shooter->sprite.getRotation() * 3.1416f / 180;
     float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2.5f);
     float yOffset = std::sin(angle) * (shooter->sprite.getLocalBounds().height / 2.5f);
     sprite.setPosition(startX + xOffset, startY + yOffset);
 
-    // Normalize direction and set velocity
+    // Obtener la direccion utilizando sqrt y dar la velocidad 
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length != 0) {
         direction /= length;
@@ -33,7 +33,7 @@ void Bullet::draw(sf::RenderWindow &window) {
     }
 }
 
-// Detectar colisión con otro objeto
+// Detectar colisión con otro tanque
 bool Bullet::checkCollision(const sf::Sprite &target) {
     if (sprite.getGlobalBounds().intersects(target.getGlobalBounds())) {
         isActive = false; // Desactivar la bala tras colisión

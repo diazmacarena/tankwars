@@ -1,21 +1,41 @@
 #include "GameInterface.h"
+#include "Game.h"
 #include <string>
+#include <iostream>
 
-#include "GameInterface.h"
-#include <string>
-#include <iostream>  // Para std::cerr
-
-GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2TankType(0) {
+GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2TankType(0), indexColors(0) {
     // Carga de la fuente
     if (!font.loadFromFile("Extra Days.ttf")) {
         std::cerr << "Error al cargar la fuente Extra Days.ttf\n";
     }
 
+    // Inicializar el título
+    Title.setFont(font);
+    Title.setString("TANK WARS");
+    Title.setCharacterSize(100);
+    Title.setPosition(600, 50);
+    Title.setFillColor(sf::Color::White); // Establecer color inicial
+
+    // Inicializar la lista de colores
+    titleColors = {
+        sf::Color::Red,
+        sf::Color::Green,
+        sf::Color::Blue,
+        sf::Color::Yellow,
+        sf::Color::Magenta,
+        sf::Color::Cyan
+    };
+
+    indexColors = 0; // Iniciar en el primer color
+
+    // Reiniciar el reloj de cambio de color
+    CambioColorClock.restart();
+
     // Opciones del menú
     std::vector<std::string> options = {"Seleccion de niveles", "Como se juega", "Salir"};
     for (size_t i = 0; i < options.size(); ++i) {
         sf::Text text(options[i], font, 80);
-        text.setPosition(500, 200 + i * 200);
+        text.setPosition(500, 350 + i * 200);
         text.setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
         menuOptions.push_back(text);
     }
@@ -43,7 +63,6 @@ GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2Ta
     }
 }
 
-
 void GameInterface::run() {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "TankWars Menu");
 
@@ -56,6 +75,26 @@ void GameInterface::run() {
 }
 
 void GameInterface::drawMenu(sf::RenderWindow &window) {
+    // Dibujar el texto de bienvenida
+    sf::Text Welcome("Welcome to...", font, 25);
+    Welcome.setPosition(570, 35);
+    Welcome.setFillColor(sf::Color::White);
+    window.draw(Welcome);
+
+    // Actualizar el color del título si ha pasado el tiempo
+    if (CambioColorClock.getElapsedTime().asSeconds() >= 0.3f) {
+        // Cambiar al siguiente color
+        indexColors = (indexColors + 1) % titleColors.size();
+        Title.setFillColor(titleColors[indexColors]);
+
+        // Reiniciar el reloj
+        CambioColorClock.restart();
+    }
+
+    // Dibujar el título
+    window.draw(Title);
+
+    // Dibujar las opciones del menú
     for (size_t i = 0; i < menuOptions.size(); ++i) {
         menuOptions[i].setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
         window.draw(menuOptions[i]);
@@ -98,7 +137,6 @@ void GameInterface::handleEvents(sf::RenderWindow &window) {
         }
     }
 }
-
 
 void GameInterface::selectLevel(sf::RenderWindow &window) {
     int level = 1;
@@ -165,7 +203,7 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
             "Jugador 1 (WASD): " + std::string(player1TankType == 0 ? "Tank" : "Tank Escopetin"),
             font, 40);
         player1Text.setPosition(300, 500);
-        player1Text.setFillColor(sf::Color::White);
+        player1Text.setFillColor(sf::Color::Red);
         window.draw(player1Text);
 
         // Mostrar tanque seleccionado para jugador 2
@@ -173,7 +211,7 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
             "Jugador 2 (Flechas): " + std::string(player2TankType == 0 ? "Tank" : "Tank Escopetin"),
             font, 40);
         player2Text.setPosition(300, 900);
-        player2Text.setFillColor(sf::Color::White);
+        player2Text.setFillColor(sf::Color::Blue);
         window.draw(player2Text);
 
         window.display();
@@ -194,19 +232,38 @@ void GameInterface::showInstructions(sf::RenderWindow &window) {
         }
 
         window.clear();
+        sf::Text controlsText("Controles para los tanques:" , font , 50 );
+        controlsText.setPosition(50, 50);
+        controlsText.setFillColor(sf::Color::Green);
+        window.draw(controlsText);
 
         sf::Text instructionsText1("Tanque 1: W A S D para moverse", font, 30);
-        instructionsText1.setPosition(100, 200);
-        instructionsText1.setFillColor(sf::Color::White);
+        instructionsText1.setPosition(50, 200);
+        instructionsText1.setFillColor(sf::Color::Red);
         window.draw(instructionsText1);
 
         sf::Text instructionsText2("Tanque 2: Usa las flechas para moverse", font, 30);
-        instructionsText2.setPosition(500, 400);
-        instructionsText2.setFillColor(sf::Color::White);
+        instructionsText2.setPosition(50, 300);
+        instructionsText2.setFillColor(sf::Color::Blue);
         window.draw(instructionsText2);
 
-        sf::Text instructionsText3("Presiona Enter para volver", font, 30);
-        instructionsText3.setPosition(500, 800);
+        sf::Text tanksTypes("Informacion de nuestros tanques:" , font , 50);
+        tanksTypes.setPosition(50, 400);
+        tanksTypes.setFillColor(sf::Color::Green);
+        window.draw(tanksTypes);
+
+        sf::Text tankInfoText("Tank = Eres un tanque normal, disparas una bala pero tienes balas ilimitadas", font, 30);
+        tankInfoText.setPosition(50, 500);
+        tankInfoText.setFillColor(sf::Color::Magenta);
+        window.draw(tankInfoText);
+
+        sf::Text tankEscopetinInfoText("Tank escopetin = Disparas 4 balas dispersas por disparo, pero solo tienes 3 disparos!", font , 30);
+        tankEscopetinInfoText.setPosition(50,600);
+        tankEscopetinInfoText.setFillColor(sf::Color::Magenta); // Corregido: Cambiar color del texto correcto
+        window.draw(tankEscopetinInfoText);
+
+        sf::Text instructionsText3("Presiona Enter para volver", font, 50);
+        instructionsText3.setPosition(1, 1000);
         instructionsText3.setFillColor(sf::Color::White);
         window.draw(instructionsText3);
 

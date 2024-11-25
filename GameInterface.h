@@ -1,11 +1,9 @@
-#ifndef GAME_INTERFACE_H
-#define GAME_INTERFACE_H
+#ifndef GAMEINTERFACE_H
+#define GAMEINTERFACE_H
 
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>  // Incluir SFML Audio
+#include <SFML/Audio.hpp>
 #include <vector>
-#include <string>
-#include "Game.h"
 
 class GameInterface {
 public:
@@ -13,19 +11,25 @@ public:
     void run();
 
 private:
-    // Métodos auxiliares
     void drawMenu(sf::RenderWindow &window);
     void handleEvents(sf::RenderWindow &window);
     void selectLevel(sf::RenderWindow &window);
     void showInstructions(sf::RenderWindow &window);
 
-    // Variables de estado
-    int currentOption;                 // Opción seleccionada en el menú
-    std::vector<sf::Text> menuOptions; // Opciones del menú
-    sf::Font font;                     // Fuente para todo el texto
+    // Variables para el menú
+    sf::Font font;
+    std::vector<sf::Text> menuOptions;
+    int currentOption;
 
-    int player1TankType; // Tipo de tanque del jugador 1: 0 = Tank, 1 = TankEscopeta
-    int player2TankType; // Tipo de tanque del jugador 2: 0 = Tank, 1 = TankEscopeta
+    // Variables para los jugadores
+    int player1TankType;
+    int player2TankType;
+
+    // Variables para el título animado
+    sf::Text Title;                // Agregado
+    sf::Clock CambioColorClock;    // Agregado
+    std::vector<sf::Color> titleColors; // Agregado
+    int indexColors;               // Agregado
 
     // Sonidos
     sf::SoundBuffer moveBuffer;
@@ -36,4 +40,4 @@ private:
     sf::Sound gameStartSound;
 };
 
-#endif // GAME_INTERFACE_H
+#endif // GAMEINTERFACE_H
