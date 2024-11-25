@@ -10,14 +10,14 @@ GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2Ta
     }
 
     // Inicializar el título
-    Title.setFont(font);
-    Title.setString("TANK WARS");
-    Title.setCharacterSize(100);
-    Title.setPosition(600, 50);
+    Title.setFont(font); // Carga la fuente
+    Title.setString("TANK WARS"); // Titulo del juego
+    Title.setCharacterSize(100); // Establece el tamaño
+    Title.setPosition(600, 50); // Ubica el titulo 
     Title.setFillColor(sf::Color::White); // Establecer color inicial
 
-    // Inicializar la lista de colores
-    titleColors = {
+    // Crear el vector de los colores para el cambio 
+    titleColors = { 
         sf::Color::Red,
         sf::Color::Green,
         sf::Color::Blue,
@@ -32,7 +32,9 @@ GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2Ta
     CambioColorClock.restart();
 
     // Opciones del menú
+    //Vector que contiene las opciones del menu
     std::vector<std::string> options = {"Seleccion de niveles", "Como se juega", "Salir"};
+    //Dibujar las partes del menu y ponerle color a la opcion seleccionada
     for (size_t i = 0; i < options.size(); ++i) {
         sf::Text text(options[i], font, 80);
         text.setPosition(500, 350 + i * 200);
@@ -64,8 +66,10 @@ GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2Ta
 }
 
 void GameInterface::run() {
+    // Dibuja la ventana con sus dimensiones y el titulo del menú
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "TankWars Menu");
-
+    
+    // Bucle principal de la interface
     while (window.isOpen()) {
         handleEvents(window);
         window.clear();
@@ -74,39 +78,14 @@ void GameInterface::run() {
     }
 }
 
-void GameInterface::drawMenu(sf::RenderWindow &window) {
-    // Dibujar el texto de bienvenida
-    sf::Text Welcome("Welcome to...", font, 25);
-    Welcome.setPosition(570, 35);
-    Welcome.setFillColor(sf::Color::White);
-    window.draw(Welcome);
-
-    // Actualizar el color del título si ha pasado el tiempo
-    if (CambioColorClock.getElapsedTime().asSeconds() >= 0.3f) {
-        // Cambiar al siguiente color
-        indexColors = (indexColors + 1) % titleColors.size();
-        Title.setFillColor(titleColors[indexColors]);
-
-        // Reiniciar el reloj
-        CambioColorClock.restart();
-    }
-
-    // Dibujar el título
-    window.draw(Title);
-
-    // Dibujar las opciones del menú
-    for (size_t i = 0; i < menuOptions.size(); ++i) {
-        menuOptions[i].setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
-        window.draw(menuOptions[i]);
-    }
-}
-
 void GameInterface::handleEvents(sf::RenderWindow &window) {
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
-            window.close();
-        } else if (event.type == sf::Event::KeyPressed) {
+            window.close(); //Cerrar la ventana si le dan a cerrar
+        }
+        //Para cambiar niveles   
+        else if (event.type == sf::Event::KeyPressed){
             if (event.key.code == sf::Keyboard::Up) {
                 int previousOption = currentOption;
                 currentOption = (currentOption - 1 + menuOptions.size()) % menuOptions.size();
@@ -138,9 +117,40 @@ void GameInterface::handleEvents(sf::RenderWindow &window) {
     }
 }
 
+void GameInterface::drawMenu(sf::RenderWindow &window) {
+    // Dibujar el texto de bienvenida
+    sf::Text Welcome("Welcome to...", font, 25);
+    Welcome.setPosition(570, 35);
+    Welcome.setFillColor(sf::Color::White);
+    window.draw(Welcome);
+
+    // Actualizar el color del título si ha pasado el tiempo
+    if (CambioColorClock.getElapsedTime().asSeconds() >= 0.3f) {
+        // Cambiar al siguiente color
+        indexColors = (indexColors + 1) % titleColors.size();
+        Title.setFillColor(titleColors[indexColors]);
+
+        // Reiniciar el reloj
+        CambioColorClock.restart();
+    }
+
+    // Dibujar el título
+    window.draw(Title);
+
+    // Dibujar las opciones del menú
+    for (size_t i = 0; i < menuOptions.size(); ++i) {
+        menuOptions[i].setFillColor(i == currentOption ? sf::Color::Green : sf::Color::White);
+        window.draw(menuOptions[i]);
+    }
+}
+
+
+/*Permite selecionar el nivel*/
 void GameInterface::selectLevel(sf::RenderWindow &window) {
+    // Nivel 1 por defecto
     int level = 1;
 
+    // Bucle para mantener la ventana abierta
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -231,15 +241,24 @@ void GameInterface::showInstructions(sf::RenderWindow &window) {
             }
         }
 
-        window.clear();
+        window.clear(); // Limpia la ventana para nuevos objetos
+        
+        // Coloca las instrucciones con su respectivo tamaño
         sf::Text controlsText("Controles para los tanques:" , font , 50 );
+        // Ubica el texto
         controlsText.setPosition(50, 50);
+        // Le da un color
         controlsText.setFillColor(sf::Color::Green);
+        // Dibuja los controles del tanque 
         window.draw(controlsText);
 
+        // Coloca los contrles del jugador 1 
         sf::Text instructionsText1("Tanque 1: W A S D para moverse", font, 30);
+        // Ubica las instrucciones
         instructionsText1.setPosition(50, 200);
+        // Color de las instrucciones 
         instructionsText1.setFillColor(sf::Color::Red);
+        // Dibuja las instrucciones en la ventana
         window.draw(instructionsText1);
 
         sf::Text instructionsText2("Tanque 2: Usa las flechas para moverse", font, 30);

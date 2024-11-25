@@ -6,20 +6,24 @@ Bullet::Bullet(const sf::Texture& texture, float startX, float startY, sf::Vecto
     : isActive(true), collisionCount(0), owner(shooter) {
     sprite.setTexture(texture);
     sprite.setScale(0.07f, 0.07f);
-
+    
+    //Lugar de donde sale la bala segun se mueva el tanque
+    
     float angle = shooter->sprite.getRotation() * 3.1416f / 180;
     float xOffset = std::cos(angle) * (shooter->sprite.getLocalBounds().width / 2.5f);
     float yOffset = std::sin(angle) * (shooter->sprite.getLocalBounds().height / 2.5f);
     sprite.setPosition(startX + xOffset, startY + yOffset);
 
-    // Obtener la direccion utilizando sqrt y dar la velocidad 
+    // Obtener la direccion utilizando sqrt y dar la velocidad de la bala
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length != 0) {
         direction /= length;
     }
     velocity = direction * 1.1f;
 }
-// Movimiento de la bala
+
+
+// Actualiza los valores que no sin constantes
 void Bullet::update() {
     if (isActive) {
         sprite.move(velocity);
@@ -63,7 +67,7 @@ void Bullet::handleWallCollision(const sf::FloatRect &wallBounds) {
 
 // Invertir dirección en X
 void Bullet::reverseX() {
-    velocity.x = -velocity.x;
+    velocity.x = -velocity.x; 
 }
 
 // Invertir dirección en Y

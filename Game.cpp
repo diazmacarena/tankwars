@@ -8,7 +8,7 @@ const int TILE_SIZE = 40;
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), gameOver(false)  {
-    // Initialize players based on playersType
+    // Switch case para los tanques que sean
     switch (playersType) {
         case 1: // Tank vs Tank
             player1 = new Tank("Tank1.png", 200, 150);
@@ -44,7 +44,7 @@ Game::Game(int playersType, const std::string& nivel)
     winnerText.setFillColor(sf::Color::Yellow);
     winnerText.setStyle(sf::Text::Bold);
 
-    // Load the bullet texture
+    // Cargar la textura de la bala
     if (!bulletTexture.loadFromFile("bullet.png")) {
         std::cerr << "Error: No se pudo cargar la textura de la bala bullet.png" << std::endl;
     }
@@ -78,9 +78,9 @@ Game::Game(int playersType, const std::string& nivel)
         std::cerr << "Error: No se pudo cargar bullet_hit.wav" << std::endl;
     } else {
         bulletHitSound.setBuffer(bulletHitBuffer);
-        bulletHitSound.setVolume(70); // Ajusta el volumen si lo deseas
+        bulletHitSound.setVolume(70);
     }
-    // Asignar los sonidos a los tanques
+    // Asignar los sonidos a los tanques con ->
     player1->setTakeDamageSound(takeDamageBuffer);
     player1->setDestructionSound(destructionBuffer);
 
@@ -94,12 +94,12 @@ Game::Game(int playersType, const std::string& nivel)
     cargarNivel(nivel);
 }
 
-
+//Destructor para los jugadores
 Game::~Game(){
     delete player1;
     delete player2;
 }
-
+//Funcion para convertir grados a radianes para la rotación 
 float Game::degreesToRadians(float degrees) {
     return degrees * (3.1416f / 180.0f);
 }
@@ -111,7 +111,7 @@ void Game::cargarNivel(const std::string& filename) {
         std::cerr << "Error al abrir el archivo de nivel: " << filename << std::endl;
         return;
     }
-
+    //Explicación:Los niveles son matrices, si ve que es 1 o 2 dibuja un muro segun sea su tipo y lo pone con pushback
     int row = 0;
     std::string line;
     while (std::getline(file, line)) {
@@ -189,7 +189,7 @@ void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPositio
         
         float overlapPercentage = calculateOverlapPercentage(tankBounds, muroBounds);
 
-        // Si el tanque tiene un solapamiento del 12% o más, restaurarlo a su última posición sin colisión
+        // Si el tanque tiene un solapamiento del 20% o más, restaurarlo a su última posición sin colisión
         if (overlapPercentage >= 20.0f) {
             player.sprite.setPosition(lastValidPosition);
         }
@@ -227,7 +227,7 @@ void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPositio
 
 // Renderizado de la escena del juego
 void Game::render() {
-    
+    //Limpia la ventana antes de hacer algo
     window.clear();
 
     if (gameOver) {
@@ -356,7 +356,6 @@ void Game::update() {
         }
 
         // Verificar colisiones con los tanques y restar vidas
-        // Verificar colisiones con los tanques y restar vidas
         if (bullet.checkCollision(player1->sprite)) {
             player1->restarVida();
             std::cout << "Jugador 1 ha recibido un impacto, vidas restantes: " << player1->vidas << std::endl;
@@ -412,4 +411,3 @@ void Game::update() {
     }
 
 }
-

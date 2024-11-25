@@ -23,6 +23,7 @@ void TankEscopeta::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, in
             for (const auto &direccion : direcciones) {
                 bullets.emplace_back(*bulletTexture, sprite.getPosition().x, sprite.getPosition().y, direccion, this);
             }
+            // Reinicia los relojes del disparo y recarga
             shootClock.restart();
             reloadClock.restart();
         }

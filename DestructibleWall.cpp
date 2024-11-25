@@ -1,6 +1,6 @@
 #include "DestructibleWall.h"
 
-// Constructor que inicializa el muro como no destruido
+// Constructor que inicializa el muro como no destruido que hereda del constructor de wall
 DestructibleWall::DestructibleWall(float width, float height, float posX, float posY, const sf::Color& color)
     : Wall(width, height, posX, posY, color), destroyed(false) {}
 

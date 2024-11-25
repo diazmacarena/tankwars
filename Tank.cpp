@@ -28,6 +28,8 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
     direction = sf::Vector2f(0, 0);
 }
 
+// La función ajusta la orientación del sprite del tanque al rotarlo un número específico de 
+// grados en sentido horario o antihorario.
 void Tank::rotate(float angle) {
     sprite.rotate(angle);
 }
@@ -39,15 +41,18 @@ void Tank::move(float offsetX, float offsetY) {
     direction.y = offsetY;
 }
 
+// Dibuja el tanque 
 void Tank::draw(sf::RenderWindow &window) {
     window.draw(sprite);
 }
 
+// Resta una vida al tanque 
 void Tank::restarVida() {
     if (vidas > 0) {
         vidas--;
         std::cout << "Vida del tanque reducida. Vidas restantes: " << vidas << std::endl;
-
+        
+        // Ajusta el volumen y reproduce el sonido al recibir daño
         takeDamageSound.setVolume(50);
         takeDamageSound.play();
     }
@@ -57,7 +62,7 @@ void Tank::restarVida() {
 
         destructionSound.setVolume(40);
         destructionSound.play();
-
+        
         ocultar();
     }
 }
@@ -66,13 +71,16 @@ bool Tank::estaDestruido() const {
     return vidas <= 0;
 }
 
+// Mueve al tanque fuera de la ventana para simular que se ha destruido 
 void Tank::ocultar() {
     sprite.setPosition(-1000, -1000);
 }
 
+// Convierte los grados a radianes
 float Tank::degreesToRadians(float degrees) {
     return degrees * (3.14159265f / 180.0f);
 }
+
 
 void Tank::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
                  const float shootInterval, const float reloadTime, sf::Clock &reloadClock) {
@@ -89,16 +97,19 @@ void Tank::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulle
     }
 }
 
+// Configura el sonido que se reproduce cuando el tanque recibe daño
 void Tank::setTakeDamageSound(const sf::SoundBuffer& buffer) {
-    takeDamageSound.setBuffer(buffer);
+    takeDamageSound.setBuffer(buffer); // Asigna un buffer de sonido al objeto de sonido "takeDamageSound"
     takeDamageSound.setVolume(100); // Volumen máximo
 }
 
+// Configura el sonido que se reproduce cuando el tanque es destruido
 void Tank::setDestructionSound(const sf::SoundBuffer& buffer) {
     destructionSound.setBuffer(buffer);
     destructionSound.setVolume(100); // Volumen máximo
 }
 
+// Configura la textura que usarán las balas disparadas por el tanque
 void Tank::setBulletTexture(const sf::Texture& texture) {
     bulletTexture = &texture;
 }

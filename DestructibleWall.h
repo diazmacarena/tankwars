@@ -3,12 +3,15 @@
 
 #include "Wall.h"
 
+// Clase que hereda de wall 
 class DestructibleWall : public Wall {
 private:
-    bool destroyed;
+    //Bool que verificara si el muro sigue en pie o esta destruido
+    bool destroyed; 
 
 public:
-    DestructibleWall(float width, float height, float posX, float posY, const sf::Color& color);
+    //Constructor
+    DestructibleWall(float ancho, float largo, float posX, float posY, const sf::Color& color);
     
     // Dibuja el muro si no está destruido
     void draw(sf::RenderWindow& window) const override;

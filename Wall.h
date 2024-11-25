@@ -5,7 +5,7 @@
 
 class Wall {
 protected:
-    sf::RectangleShape shape;
+    sf::RectangleShape shape; // Objeto (rectangulo) que representa un muro 
 
 public:
     Wall() = default;
