@@ -3,8 +3,6 @@
 #include <fstream>
 #include <iostream>
 
-// Tamaño de cada celda en el laberinto
-
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), gameOver(false)  {
@@ -16,15 +14,15 @@ Game::Game(int playersType, const std::string& nivel)
             break;
         case 2: // Tank vs TankEscopeta
             player1 = new Tank("Tank1.png", 200, 150);
-            player2 = new TankEscopeta("Tank2.png", 1600, 800);
+            player2 = new TankEscopeta("Tank4.png", 1600, 800);
             break;
         case 3: // TankEscopeta vs Tank
-            player1 = new TankEscopeta("Tank1.png", 200, 150);
+            player1 = new TankEscopeta("Tank3.png", 200, 150);
             player2 = new Tank("Tank2.png", 1600, 800);
             break;
         case 4: // TankEscopeta vs TankEscopeta
-            player1 = new TankEscopeta("Tank1.png", 200, 150);
-            player2 = new TankEscopeta("Tank2.png", 1600, 800);
+            player1 = new TankEscopeta("Tank3.png", 200, 150);
+            player2 = new TankEscopeta("Tank4.png", 1600, 800);
             break;
         default:
             std::cerr << "Tipo de jugadores no válido. Usando configuración predeterminada (1 Tank, 1 TankEscopeta).\n";
@@ -109,7 +107,7 @@ void Game::cargarNivel(const std::string& filename) {
         std::cerr << "Error al abrir el archivo de nivel: " << filename << std::endl;
         return;
     }
-    //Explicación:Los niveles son matrices, si ve que es 1 o 2 dibuja un muro segun sea su tipo y lo pone con pushback
+    //Explicación: Los niveles son matrices, si ve que es 1 o 2 dibuja un muro segun sea su tipo y lo pone con pushback
     int row = 0;
     std::string line;
     while (std::getline(file, line)) {

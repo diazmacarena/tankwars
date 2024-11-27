@@ -74,8 +74,7 @@ void Tank::disparar(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bu
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval && bulletCount > 0) {
         float angleRadians = degreesToRadians(sprite.getRotation());
         sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
-
-        // Use bulletTexture instead of "bullet.png"
+        //utiliza la memoria del vector, evita copias
         bullets.emplace_back(*bulletTexture, sprite.getPosition().x, sprite.getPosition().y, direction, this);
         bulletCount--;
         shootClock.restart();

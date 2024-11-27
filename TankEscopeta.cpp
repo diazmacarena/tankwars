@@ -13,6 +13,7 @@ TankEscopeta::TankEscopeta(const std::string& textureFile, float initialX, float
     std::cout << "TankEscopeta creado correctamente con la textura " << textureFile << std::endl;
 }
 
+//Tiene la misma funcionalidad que el disparar, pero este usa el vector de direcciones almacenadas para sacar balas en cada una
 void TankEscopeta::disparar(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
                          const float shootInterval, const float reloadTime, sf::Clock &reloadClock) {
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval && cartucho.getBalasRestantes() > 0) {
