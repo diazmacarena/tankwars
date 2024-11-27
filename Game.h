@@ -38,7 +38,7 @@ private:
     sf::Clock reloadClockPlayer2;
     sf::Clock tiempoMostrarGanador; // Reloj para manejar EL TIEMPO QUE SE MUESTRA AL GANADOR
 
-    // Muros y paredes 
+    // Vectores que se usan en draw 
     std::vector<Wall> walls; // Vector para almacenar los muros indestructibles
     std::vector<DestructibleWall> destructibleWalls; // Vector para almacenar los muros destructibles
     sf::Vector2f ultimaPosicionValidaPlayer1; // Última posicion del jugador1
@@ -58,40 +58,30 @@ private:
     sf::SoundBuffer bulletHitBuffer;   // Buffer para sonido de impacto de la bala
     sf::Sound bulletHitSound;          // Sonido de impacto de bala
 
-    // Convierte ángulos en grados a radianes
-    float degreesToRadians(float degrees);
-   
-    // Maneja eventos del juego (teclado, mouse, etc.)
-    void manejarEventos();
-   
-    // Mueve el tanque especificado, actualizando su posición
-    void moverTanque(Tank &player, float speed, sf::Vector2f &lastpositions);
-   
-    // Actualiza la lógica del juego (movimientos, colisiones, etc.)
-    void actualizar();
-   
-    // Renderiza (dibuja) los objetos en la pantalla
-    void renderizar();
-   
-    // Dispara una bala desde el tanque especificado
-    void dispararBala(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock);
-    
-    // Dispara varias balas tipo escopeta desde el tanque especificado   
-    void dispararEscopeta(TankEscopeta &player, sf::Clock &shootClock);
-
     // Carga el nivel desde un archivo de configuración
     void cargarNivel(const std::string& filename);
+    // Maneja eventos del juego (teclado, mouse, etc.)
+    void manejarEventos();
+    // Actualiza la lógica del juego (movimientos, colisiones, etc.)
+    void actualizar();
+    // Mueve el tanque especificado, actualizando su posición
+    void moverTanque(Tank &player, float speed, sf::Vector2f &lastpositions);
+    // Dispara una bala desde el tanque especificado
+    void dispararBala(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock);
+    // Renderiza (dibuja) los objetos en la pantalla
+    void renderizar();
+    // Convierte ángulos en grados a radianes
+    float degreesToRadians(float degrees);
 
 public:  // 2 jugadores (1 Tank, 1 Tank)
     
     // Constructor: Inicializa el juego con el tipo de jugadores y el mapa
     Game(int playersType, const std::string& mapFile);           
-    
+    // Destructor para liberar memoria y recursos
+    ~Game();
     // Inicia el ciclo principal del juego
     void correr();
     
-    // Destructor para liberar memoria y recursos
-    ~Game();
 };
 
 #endif // GAME_H

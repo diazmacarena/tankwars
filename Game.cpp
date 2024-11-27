@@ -100,11 +100,8 @@ Game::~Game(){
     delete player1;
     delete player2;
 }
-//Funcion para convertir grados a radianes para la rotación 
-float Game::degreesToRadians(float degrees) {
-    return degrees * (3.1416f / 180.0f);
-}
-const int TILE_SIZE = 40;
+
+const int TAM_CELDA = 40;
 // Función para cargar el nivel desde un archivo
 void Game::cargarNivel(const std::string& filename) {
     std::ifstream file(filename);
@@ -118,14 +115,46 @@ void Game::cargarNivel(const std::string& filename) {
     while (std::getline(file, line)) {
         for (size_t col = 0; col < line.size(); ++col) {
             if (line[col] == '2') {  // Muro destructible
-                destructibleWalls.push_back(DestructibleWall(TILE_SIZE, TILE_SIZE, col * TILE_SIZE, row * TILE_SIZE, sf::Color(128, 0, 128))); // Morado
+                destructibleWalls.push_back(DestructibleWall(TAM_CELDA, TAM_CELDA, col * TAM_CELDA, row * TAM_CELDA, sf::Color::Blue)); // Azul
             }
             else if (line[col] == '1') {  // Muro normal
-                walls.push_back(Wall(TILE_SIZE, TILE_SIZE, col * TILE_SIZE, row * TILE_SIZE, sf::Color::White)); // Blanco
+                walls.push_back(Wall(TAM_CELDA, TAM_CELDA, col * TAM_CELDA, row * TAM_CELDA, sf::Color::White)); // Blanco
             }
         }
         row++;
     }
+}
+
+void Game::renderizar() {
+    //Limpia la ventana antes de hacer algo
+    window.clear();
+
+    if (gameOver) {
+        // Mostrar el mensaje del ganador
+        window.draw(textoGanador);
+    } else {
+        window.draw(player1->sprite);
+        window.draw(player2->sprite);
+
+        // Dibujar balas
+        for (const auto &bullet : bullets) {
+            if (bullet.isActive) {
+                window.draw(bullet.sprite);
+            }
+        }
+        // Dibujar paredes
+        for (const auto &wall : walls) {
+            wall.dibujar(window);
+}
+        // Dibujar muros destructibles
+        for (const auto &destructibleWall : destructibleWalls) {
+            if (!destructibleWall.isDestroyed()) {
+                 destructibleWall.dibujar(window);
+    }
+}
+}
+
+    window.display();
 }
 
 // Función para procesar eventos de control
@@ -164,124 +193,6 @@ void Game::manejarEventos() {
     }
 }
 
-void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPosition) {
-    float angRadianes = degreesToRadians(player.sprite.getRotation());
-    float dx = std::cos(angRadianes) * speed;
-    float dy = std::sin(angRadianes) * speed;
-
-    // Intentar mover el tanque temporalmente para verificar colisiones
-    player.mover(dx, dy);
-
-    auto calcularSobrePosicion= [&](const sf::FloatRect& tankBounds, const sf::FloatRect& wallBounds) -> float {
-        float sobreX = std::max(0.0f, std::min(tankBounds.left + tankBounds.width, wallBounds.left + wallBounds.width) - 
-                                      std::max(tankBounds.left, wallBounds.left));
-        float sobreY = std::max(0.0f, std::min(tankBounds.top + tankBounds.height, wallBounds.top + wallBounds.height) - 
-                                      std::max(tankBounds.top, wallBounds.top));
-
-        float sobreArea = sobreX * sobreY;
-        float tankArea = tankBounds.width * tankBounds.height;
-
-        return (sobreArea / tankArea) * 100;  // Porcentaje de solapamiento
-    };
-
-    auto handleCollision = [&](const Wall& muro) {
-        sf::FloatRect muroBounds = muro.getBounds();
-        sf::FloatRect tankBounds = player.sprite.getGlobalBounds();
-        
-        float porcentajeSobrePosicion = calcularSobrePosicion(tankBounds, muroBounds);
-
-        // Si el tanque tiene un solapamiento del 20% o más, restaurarlo a su última posición sin colisión
-        if (porcentajeSobrePosicion >= 20.0f) {
-            player.sprite.setPosition(lastValidPosition);
-        }
-    };
-
-    bool isColliding = false;
-
-    // Verificar colisiones con muros destructibles
-    for (auto& muro : destructibleWalls) {
-        if (player.sprite.getGlobalBounds().intersects(muro.getBounds()) && !muro.isDestroyed()) {
-            handleCollision(muro);
-            isColliding = true;
-            break;
-        }
-    }
-
-    // Verificar colisiones con muros no destructibles
-    for (auto& muro : walls) {
-        if (player.sprite.getGlobalBounds().intersects(muro.getBounds())) {
-            handleCollision(muro);
-            isColliding = true;
-            break;
-        }
-    }
-
-    // Solo actualizar la última posición válida si no hay colisión
-    if (!isColliding) {
-        lastValidPosition = player.sprite.getPosition();
-    } else {
-        // Si hay una colisión, revertir a la última posición válida y no permitir movimiento hacia el muro
-        player.sprite.setPosition(lastValidPosition);
-    }
-}
-
-
-// Renderizado de la escena del juego
-void Game::renderizar() {
-    //Limpia la ventana antes de hacer algo
-    window.clear();
-
-    if (gameOver) {
-        // Mostrar el mensaje del ganador
-        window.draw(textoGanador);
-    } else {
-        window.draw(player1->sprite);
-        window.draw(player2->sprite);
-
-        // Dibujar balas
-        for (const auto &bullet : bullets) {
-            if (bullet.isActive) {
-                window.draw(bullet.sprite);
-            }
-        }
-        // Dibujar paredes
-        for (const auto &wall : walls) {
-            wall.dibujar(window);
-}
-
-// Dibujar muros destructibles
-        for (const auto &destructibleWall : destructibleWalls) {
-            if (!destructibleWall.isDestroyed()) {
-                 destructibleWall.dibujar(window);
-    }
-}
-}
-
-    window.display();
-}
-
-
-// Disparar balas
-void Game::dispararBala(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
-    if (bulletCount > 0) {
-        float angleRadians = degreesToRadians(player.sprite.getRotation());
-        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
-
-        bullets.emplace_back(bulletTexture, player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
-
-        bulletCount--;
-        shootClock.restart();
-        reloadClock.restart();
-    }
-}
-
-void Game::correr() {
-    while (window.isOpen()) {
-        manejarEventos();
-        actualizar();
-        renderizar();
-    }
-}
 void Game::actualizar() {
     if (gameOver) {
         // Verificar si han pasado 4 segundos
@@ -388,7 +299,7 @@ void Game::actualizar() {
             } else {
                 textoGanador.setString("Empate");
             }
-
+        
             // Centrar el texto en la pantalla
             sf::FloatRect textRect = textoGanador.getLocalBounds();
             textoGanador.setOrigin(textRect.left + textRect.width / 2.0f,
@@ -397,4 +308,93 @@ void Game::actualizar() {
         }
     }
 
+}
+
+void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPosition) {
+    float angRadianes = degreesToRadians(player.sprite.getRotation());
+    float dx = std::cos(angRadianes) * speed;
+    float dy = std::sin(angRadianes) * speed;
+
+    // Intentar mover el tanque temporalmente para verificar colisiones
+    player.mover(dx, dy);
+
+    auto calcularSobrePosicion= [&](const sf::FloatRect& tankBounds, const sf::FloatRect& wallBounds) -> float {
+        float sobreX = std::max(0.0f, std::min(tankBounds.left + tankBounds.width, wallBounds.left + wallBounds.width) - 
+                                      std::max(tankBounds.left, wallBounds.left));
+        float sobreY = std::max(0.0f, std::min(tankBounds.top + tankBounds.height, wallBounds.top + wallBounds.height) - 
+                                      std::max(tankBounds.top, wallBounds.top));
+
+        float sobreArea = sobreX * sobreY;
+        float tankArea = tankBounds.width * tankBounds.height;
+
+        return (sobreArea / tankArea) * 100;  // Porcentaje de solapamiento
+    };
+    //auto = el compilador evalúa que valor te da y [&] establece todos los valores dentro de la función
+    auto handleCollision = [&](const Wall& muro) {
+        sf::FloatRect muroBounds = muro.getBounds();
+        sf::FloatRect tankBounds = player.sprite.getGlobalBounds();
+        
+        float porcentajeSobrePosicion = calcularSobrePosicion(tankBounds, muroBounds);
+
+        // Si el tanque tiene un solapamiento del 20% o más, restaurarlo a su última posición sin colisión
+        if (porcentajeSobrePosicion >= 20.0f) {
+            player.sprite.setPosition(lastValidPosition);
+        }
+    };
+
+    bool isColliding = false;
+
+    // Verificar colisiones con muros destructibles
+    for (auto& muro : destructibleWalls) {
+        if (player.sprite.getGlobalBounds().intersects(muro.getBounds()) && !muro.isDestroyed()) {
+            handleCollision(muro);
+            isColliding = true;
+            break;
+        }
+    }
+
+    // Verificar colisiones con muros no destructibles
+    for (auto& muro : walls) {
+        if (player.sprite.getGlobalBounds().intersects(muro.getBounds())) {
+            handleCollision(muro);
+            isColliding = true;
+            break;
+        }
+    }
+
+    // Solo actualizar la última posición válida si no hay colisión
+    if (!isColliding) {
+        lastValidPosition = player.sprite.getPosition();
+    } else {
+        // Si hay una colisión, revertir a la última posición válida y no permitir movimiento hacia el muro
+        player.sprite.setPosition(lastValidPosition);
+    }
+}
+
+// Disparar balas
+void Game::dispararBala(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
+    if (bulletCount > 0) {
+        float angleRadians = degreesToRadians(player.sprite.getRotation());
+        sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
+
+        bullets.emplace_back(bulletTexture, player.sprite.getPosition().x, player.sprite.getPosition().y, direction, &player);
+
+        bulletCount--;
+        shootClock.restart();
+        reloadClock.restart();
+    }
+}
+
+// Renderizado de la escena del juego
+void Game::correr() {
+    while (window.isOpen()) {
+        manejarEventos();
+        actualizar();
+        renderizar();
+    }
+}
+
+//Funcion para convertir grados a radianes para la rotación 
+float Game::degreesToRadians(float degrees) {
+    return degrees * (3.1416f / 180.0f);
 }

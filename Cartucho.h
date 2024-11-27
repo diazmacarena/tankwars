@@ -6,10 +6,8 @@
 
 class Cartucho {
 private:
-
     int balasRestantes; //Balas que nos quedan
     float dispersion;   //Angulo de dispersion
-
 public:
     // Constructor con parametros por defecto
     Cartucho(int balas = 4, float dispersion = 15.0f);

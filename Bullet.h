@@ -7,13 +7,14 @@
 #include <string>
 //Buena practica de programacion, evita las dependencias circulares a la hora de compilar
 class Tank;
+
 //Clase bala
 class Bullet {
 public:
     sf::Sprite sprite;  //Gaseosa :v
     sf::Texture texture; //Textura que vamos a subir para la bala
     sf::Vector2f velocity; // Vector 2D para manejar las posiciones (x,y)
-    bool isActive;
+    bool isActive; //Ver si la bala existe o no
     int collisionCount;  // Contador de colisiones
     Tank* owner;         // Puntero al tanque que disparó la bala
 

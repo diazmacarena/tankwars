@@ -30,9 +30,6 @@ void TankEscopeta::disparar(std::vector<Bullet>& bullets, sf::Clock &shootClock,
     }
 }
 
-
-
-
 // Método para obtener las balas restantes
 int TankEscopeta::getBalasRestantes() const {
     return cartucho.getBalasRestantes();

@@ -32,6 +32,7 @@ GameInterface::GameInterface() : currentOption(0), player1TankType(0), player2Ta
     CambioColorClock.restart();
 
     // Opciones del menú
+    
     //Vector que contiene las opciones del menu
     std::vector<std::string> options = {"Seleccion de niveles", "Como se juega", "Salir"};
     //Dibujar las partes del menu y ponerle color a la opcion seleccionada
