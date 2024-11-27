@@ -21,9 +21,9 @@ public:
     Tank(const std::string& textureFile, float initialX, float initialY);
 
     // Funciones virtuales para ser sobrescritas por clases derivadas
-    virtual void rotate(float angle); //Ángulo en grados por el cual rotar el tanque.
-    virtual void move(float offsetX, float offsetY);//Mueve el tanque por una distancia específica.
-    virtual void draw(sf::RenderWindow &window);//Dibuja el tanque en la ventana del juego.
+    virtual void rotar(float angle); //Ángulo en grados por el cual rotar el tanque.
+    virtual void mover(float offsetX, float offsetY);//Mueve el tanque por una distancia específica.
+    virtual void dibujar(sf::RenderWindow &window);//Dibuja el tanque en la ventana del juego.
 
     // Método virtual para restar vida del tanque.
     virtual void restarVida();
@@ -37,7 +37,7 @@ public:
      reloadTime Tiempo necesario para recargar el arma.
      reloadClock Reloj que mide el tiempo de recarga.
      */
-    virtual void shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock,
+    virtual void disparar(std::vector<Bullet>& bullets, sf::Clock &shootClock,
                          int &bulletCount, const float shootInterval,
                          const float reloadTime, sf::Clock &reloadClock);
 

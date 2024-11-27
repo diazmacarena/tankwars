@@ -71,14 +71,14 @@ void GameInterface::run() {
     
     // Bucle principal de la interface
     while (window.isOpen()) {
-        handleEvents(window);
+        eventos(window);
         window.clear();
-        drawMenu(window);
+        dibujarMenu(window);
         window.display();
     }
 }
 
-void GameInterface::handleEvents(sf::RenderWindow &window) {
+void GameInterface::eventos(sf::RenderWindow &window) {
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -106,9 +106,9 @@ void GameInterface::handleEvents(sf::RenderWindow &window) {
                 if (currentOption == 0) {
                     // Reproducir sonido de inicio del juego
                     gameStartSound.play();
-                    selectLevel(window);
+                    seleccionarNivel(window);
                 } else if (currentOption == 1) {
-                    showInstructions(window);
+                    instrucciones(window);
                 } else if (currentOption == 2) {
                     window.close();
                 }
@@ -117,7 +117,7 @@ void GameInterface::handleEvents(sf::RenderWindow &window) {
     }
 }
 
-void GameInterface::drawMenu(sf::RenderWindow &window) {
+void GameInterface::dibujarMenu(sf::RenderWindow &window) {
     // Dibujar el texto de bienvenida
     sf::Text Welcome("Welcome to...", font, 25);
     Welcome.setPosition(570, 35);
@@ -146,7 +146,7 @@ void GameInterface::drawMenu(sf::RenderWindow &window) {
 
 
 /*Permite selecionar el nivel*/
-void GameInterface::selectLevel(sf::RenderWindow &window) {
+void GameInterface::seleccionarNivel(sf::RenderWindow &window) {
     // Nivel 1 por defecto
     int level = 1;
 
@@ -189,7 +189,7 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
                     }
 
                     Game juego(playersType, mapFile);
-                    juego.run();
+                    juego.correr();
                     return;
                 }
 
@@ -228,7 +228,7 @@ void GameInterface::selectLevel(sf::RenderWindow &window) {
     }
 }
 
-void GameInterface::showInstructions(sf::RenderWindow &window) {
+void GameInterface::instrucciones(sf::RenderWindow &window) {
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

@@ -12,13 +12,13 @@ public:
 
 private:
     // Dibuja el menu principal del juego(elegir tanque, nivel, instrucciones)
-    void drawMenu(sf::RenderWindow &window);
+    void dibujarMenu(sf::RenderWindow &window);
     // Manejo de eventos al presionar las flecas, eleccion de tanques, nivel, etc.
-    void handleEvents(sf::RenderWindow &window);
+    void eventos(sf::RenderWindow &window);
     // Selecionar el nivel desea
-    void selectLevel(sf::RenderWindow &window);
+    void seleccionarNivel(sf::RenderWindow &window);
     // Muestra las instrucciones
-    void showInstructions(sf::RenderWindow &window);
+    void instrucciones(sf::RenderWindow &window);
 
     // Variables para el menú
     sf::Font font;

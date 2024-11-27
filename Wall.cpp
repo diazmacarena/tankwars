@@ -11,7 +11,7 @@ Wall::Wall(float width, float height, float posX, float posY, const sf::Color& c
 }
 
 // Dibuja el muro
-void Wall::draw(sf::RenderWindow& window) const {
+void Wall::dibujar(sf::RenderWindow& window) const {
     window.draw(shape);
 }
 

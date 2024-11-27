@@ -24,21 +24,21 @@ Bullet::Bullet(const sf::Texture& texture, float startX, float startY, sf::Vecto
 
 
 // Actualiza los valores que no sin constantes
-void Bullet::update() {
+void Bullet::actualizar() {
     if (isActive) {
         sprite.move(velocity);
     }
 }
 
 // Dibujar la bala
-void Bullet::draw(sf::RenderWindow &window) {
+void Bullet::dibujar(sf::RenderWindow &window) {
     if (isActive) {
         window.draw(sprite);
     }
 }
 
 // Detectar colisión con otro tanque
-bool Bullet::checkCollision(const sf::Sprite &target) {
+bool Bullet::colisionTanque(const sf::Sprite &target) {
     if (sprite.getGlobalBounds().intersects(target.getGlobalBounds())) {
         isActive = false; // Desactivar la bala tras colisión
         return true;
@@ -47,30 +47,30 @@ bool Bullet::checkCollision(const sf::Sprite &target) {
 }
 
 // Detectar colisión con un muro y ajustar dirección
-void Bullet::handleWallCollision(const sf::FloatRect &wallBounds) {
+void Bullet::colisionMuro(const sf::FloatRect &wallBounds) {
     sf::FloatRect bulletBounds = sprite.getGlobalBounds();
 
     // Verificar colisión en X
     if (bulletBounds.left < wallBounds.left || 
         bulletBounds.left + bulletBounds.width > wallBounds.left + wallBounds.width) {
-        reverseX(); // Invertir dirección en X
+        reboteX(); // Invertir dirección en X
         collisionCount++;
     }
 
     // Verificar colisión en Y
     if (bulletBounds.top < wallBounds.top || 
         bulletBounds.top + bulletBounds.height > wallBounds.top + wallBounds.height) {
-        reverseY(); // Invertir dirección en Y
+        reboteY(); // Invertir dirección en Y
         collisionCount++;
     }
 }
 
 // Invertir dirección en X
-void Bullet::reverseX() {
+void Bullet::reboteX() {
     velocity.x = -velocity.x; 
 }
 
 // Invertir dirección en Y
-void Bullet::reverseY() {
+void Bullet::reboteY() {
     velocity.y = -velocity.y;
 }

@@ -28,7 +28,7 @@ bool Cartucho::disparar(std::vector<sf::Vector2f>& direcciones, float baseAngle)
     return true;
 }
 
-// Balas :v
+// Balas 
 int Cartucho::getBalasRestantes() const {
     return balasRestantes;
 }

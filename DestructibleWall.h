@@ -6,21 +6,21 @@
 // Clase que hereda de wall 
 class DestructibleWall : public Wall {
 private:
-    //Bool que verificara si el muro sigue en pie o esta destruido
-    bool destroyed; 
+    
+    bool destroyed; //Bool que verificara si el muro sigue en pie o esta destruido
 
 public:
-    //Constructor
+ 
     DestructibleWall(float ancho, float largo, float posX, float posY, const sf::Color& color);
     
-    // Dibuja el muro si no está destruido
-    void draw(sf::RenderWindow& window) const override;
+   
+    void dibujar(sf::RenderWindow& window) const override; // Dibuja el muro si no está destruido
 
-    // Marca el muro como destruido al recibir un impacto
-    void hit();
     
-    // Verifica si el muro está destruido
-    bool isDestroyed() const;
+    void impacto();// Marca el muro como destruido al recibir un impacto
+    
+    
+    bool isDestroyed() const;// Verifica si el muro está destruido
 };
 
 #endif // DESTRUCTIBLE_WALL_H

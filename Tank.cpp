@@ -30,11 +30,11 @@ Tank::Tank(const std::string& textureFile, float initialX, float initialY) : vid
 
 // La función ajusta la orientación del sprite del tanque al rotarlo un número específico de 
 // grados en sentido horario o antihorario.
-void Tank::rotate(float angle) {
+void Tank::rotar(float angle) {
     sprite.rotate(angle);
 }
 
-void Tank::move(float offsetX, float offsetY) {
+void Tank::mover(float offsetX, float offsetY) {
     // No multiplicamos por 'speed' aquí porque ya se aplicó en Game::moverTanque
     sprite.move(offsetX, offsetY);
     direction.x = offsetX;
@@ -42,7 +42,7 @@ void Tank::move(float offsetX, float offsetY) {
 }
 
 // Dibuja el tanque 
-void Tank::draw(sf::RenderWindow &window) {
+void Tank::dibujar(sf::RenderWindow &window) {
     window.draw(sprite);
 }
 
@@ -82,7 +82,7 @@ float Tank::degreesToRadians(float degrees) {
 }
 
 
-void Tank::shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
+void Tank::disparar(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
                  const float shootInterval, const float reloadTime, sf::Clock &reloadClock) {
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval && bulletCount > 0) {
         float angleRadians = degreesToRadians(sprite.getRotation());

@@ -4,7 +4,7 @@
 #include <iostream>
 
 // Tamaño de cada celda en el laberinto
-const int TILE_SIZE = 40;
+
 // Constructor para casos 1-2, 1-4, 3-2, 3-4
 Game::Game(int playersType, const std::string& nivel)
     : window(sf::VideoMode(1920, 1080), "Tanks Multiplayer"), gameOver(false)  {
@@ -39,10 +39,10 @@ Game::Game(int playersType, const std::string& nivel)
     }
 
     // Configurar el texto del ganador
-    winnerText.setFont(font);
-    winnerText.setCharacterSize(80);
-    winnerText.setFillColor(sf::Color::Yellow);
-    winnerText.setStyle(sf::Text::Bold);
+    textoGanador.setFont(font);
+    textoGanador.setCharacterSize(80);
+    textoGanador.setFillColor(sf::Color::Yellow);
+    textoGanador.setStyle(sf::Text::Bold);
 
     // Cargar la textura de la bala
     if (!bulletTexture.loadFromFile("bullet.png")) {
@@ -80,6 +80,7 @@ Game::Game(int playersType, const std::string& nivel)
         bulletHitSound.setBuffer(bulletHitBuffer);
         bulletHitSound.setVolume(70);
     }
+
     // Asignar los sonidos a los tanques con ->
     player1->setTakeDamageSound(takeDamageBuffer);
     player1->setDestructionSound(destructionBuffer);
@@ -87,7 +88,7 @@ Game::Game(int playersType, const std::string& nivel)
     player2->setTakeDamageSound(takeDamageBuffer);
     player2->setDestructionSound(destructionBuffer);
 
-    // Set the bullet texture for the tanks
+    // Asignar la textura de la bala
     player1->setBulletTexture(bulletTexture);
     player2->setBulletTexture(bulletTexture);
 
@@ -103,7 +104,7 @@ Game::~Game(){
 float Game::degreesToRadians(float degrees) {
     return degrees * (3.1416f / 180.0f);
 }
-
+const int TILE_SIZE = 40;
 // Función para cargar el nivel desde un archivo
 void Game::cargarNivel(const std::string& filename) {
     std::ifstream file(filename);
@@ -128,7 +129,7 @@ void Game::cargarNivel(const std::string& filename) {
 }
 
 // Función para procesar eventos de control
-void Game::processEvents() {
+void Game::manejarEventos() {
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -138,59 +139,59 @@ void Game::processEvents() {
 
     // Control del jugador 1
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) 
-        moverTanque(*player1, movementSpeed, lastValidPositionPlayer1);
+        moverTanque(*player1, velocidadDeMovimiento, ultimaPosicionValidaPlayer1);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) 
-        moverTanque(*player1, -movementSpeed, lastValidPositionPlayer1);
+        moverTanque(*player1, -velocidadDeMovimiento, ultimaPosicionValidaPlayer1);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) 
-        player1->rotate(-rotationSpeed);
+        player1->rotar(-velocidadDeRotacion);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
-        player1->rotate(rotationSpeed);
+        player1->rotar(velocidadDeRotacion);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        player1->shoot(bullets, shootClockPlayer1, player1Bullets, shootInterval, reloadTime, reloadClockPlayer1);
+        player1->disparar(bullets, shootClockPlayer1, player1Balas, intervaloDisparos, recarga, reloadClockPlayer1);
     }
 
     // Control del jugador 2
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) 
-        moverTanque(*player2, movementSpeed, lastValidPositionPlayer2);
+        moverTanque(*player2, velocidadDeMovimiento, ultimaPosicionValidaPlayer2);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        moverTanque(*player2, -movementSpeed, lastValidPositionPlayer2);
+        moverTanque(*player2, -velocidadDeMovimiento, ultimaPosicionValidaPlayer2);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        player2->rotate(-rotationSpeed);
+        player2->rotar(-velocidadDeRotacion);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) 
-        player2->rotate(rotationSpeed);
+        player2->rotar(velocidadDeRotacion);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
-        player2->shoot(bullets, shootClockPlayer2, player2Bullets, shootInterval, reloadTime, reloadClockPlayer2);
+        player2->disparar(bullets, shootClockPlayer2, player2Balas, intervaloDisparos, recarga, reloadClockPlayer2);
     }
 }
 
 void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPosition) {
-    float angleRadians = degreesToRadians(player.sprite.getRotation());
-    float dx = std::cos(angleRadians) * speed;
-    float dy = std::sin(angleRadians) * speed;
+    float angRadianes = degreesToRadians(player.sprite.getRotation());
+    float dx = std::cos(angRadianes) * speed;
+    float dy = std::sin(angRadianes) * speed;
 
     // Intentar mover el tanque temporalmente para verificar colisiones
-    player.move(dx, dy);
+    player.mover(dx, dy);
 
-    auto calculateOverlapPercentage = [&](const sf::FloatRect& tankBounds, const sf::FloatRect& wallBounds) -> float {
-        float overlapX = std::max(0.0f, std::min(tankBounds.left + tankBounds.width, wallBounds.left + wallBounds.width) - 
+    auto calcularSobrePosicion= [&](const sf::FloatRect& tankBounds, const sf::FloatRect& wallBounds) -> float {
+        float sobreX = std::max(0.0f, std::min(tankBounds.left + tankBounds.width, wallBounds.left + wallBounds.width) - 
                                       std::max(tankBounds.left, wallBounds.left));
-        float overlapY = std::max(0.0f, std::min(tankBounds.top + tankBounds.height, wallBounds.top + wallBounds.height) - 
+        float sobreY = std::max(0.0f, std::min(tankBounds.top + tankBounds.height, wallBounds.top + wallBounds.height) - 
                                       std::max(tankBounds.top, wallBounds.top));
 
-        float overlapArea = overlapX * overlapY;
+        float sobreArea = sobreX * sobreY;
         float tankArea = tankBounds.width * tankBounds.height;
 
-        return (overlapArea / tankArea) * 100;  // Porcentaje de solapamiento
+        return (sobreArea / tankArea) * 100;  // Porcentaje de solapamiento
     };
 
     auto handleCollision = [&](const Wall& muro) {
         sf::FloatRect muroBounds = muro.getBounds();
         sf::FloatRect tankBounds = player.sprite.getGlobalBounds();
         
-        float overlapPercentage = calculateOverlapPercentage(tankBounds, muroBounds);
+        float porcentajeSobrePosicion = calcularSobrePosicion(tankBounds, muroBounds);
 
         // Si el tanque tiene un solapamiento del 20% o más, restaurarlo a su última posición sin colisión
-        if (overlapPercentage >= 20.0f) {
+        if (porcentajeSobrePosicion >= 20.0f) {
             player.sprite.setPosition(lastValidPosition);
         }
     };
@@ -226,13 +227,13 @@ void Game::moverTanque(Tank &player, float speed, sf::Vector2f &lastValidPositio
 
 
 // Renderizado de la escena del juego
-void Game::render() {
+void Game::renderizar() {
     //Limpia la ventana antes de hacer algo
     window.clear();
 
     if (gameOver) {
         // Mostrar el mensaje del ganador
-        window.draw(winnerText);
+        window.draw(textoGanador);
     } else {
         window.draw(player1->sprite);
         window.draw(player2->sprite);
@@ -245,13 +246,13 @@ void Game::render() {
         }
         // Dibujar paredes
         for (const auto &wall : walls) {
-            wall.draw(window);
+            wall.dibujar(window);
 }
 
 // Dibujar muros destructibles
         for (const auto &destructibleWall : destructibleWalls) {
             if (!destructibleWall.isDestroyed()) {
-                 destructibleWall.draw(window);
+                 destructibleWall.dibujar(window);
     }
 }
 }
@@ -261,7 +262,7 @@ void Game::render() {
 
 
 // Disparar balas
-void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
+void Game::dispararBala(Tank &player, int &bulletCount, sf::Clock &shootClock, sf::Clock &reloadClock) {
     if (bulletCount > 0) {
         float angleRadians = degreesToRadians(player.sprite.getRotation());
         sf::Vector2f direction(std::cos(angleRadians), std::sin(angleRadians));
@@ -273,32 +274,18 @@ void Game::shootBullet(Tank &player, int &bulletCount, sf::Clock &shootClock, sf
         reloadClock.restart();
     }
 }
-// Dibuja las vidas de los tanques
-void drawLives(sf::RenderWindow& window, const std::vector<Tank>& tanks, sf::Font& font) {
-    for (const auto& tank : tanks) {
-        if (!tank.estaDestruido()) {
-            sf::Text text;
-            text.setFont(font);
-            text.setString("Vidas: " + std::to_string(tank.vidas));
-            text.setCharacterSize(16);
-            text.setFillColor(sf::Color::White);
-            text.setPosition(tank.sprite.getPosition().x - 20, tank.sprite.getPosition().y - 50);
-            window.draw(text);
-        }
-    }
-}
 
-void Game::run() {
+void Game::correr() {
     while (window.isOpen()) {
-        processEvents();
-        update();
-        render();
+        manejarEventos();
+        actualizar();
+        renderizar();
     }
 }
-void Game::update() {
+void Game::actualizar() {
     if (gameOver) {
         // Verificar si han pasado 4 segundos
-        if (gameOverClock.getElapsedTime().asSeconds() >= 4.0f) {
+        if (tiempoMostrarGanador.getElapsedTime().asSeconds() >= 4.0f) {
             window.close(); // Cerrar la ventana del juego
         }
         return; // No continuar actualizando el juego
@@ -307,18 +294,18 @@ void Game::update() {
     for (auto& bullet : bullets) {
         if (!bullet.isActive) continue;
 
-        bullet.update();
+        bullet.actualizar();
 
         // Colisiones de la bala con muros destructibles
         for (auto& wall : destructibleWalls) {
             // Solo verificar colisión si el muro no está destruido
             if (!wall.isDestroyed() && bullet.sprite.getGlobalBounds().intersects(wall.getBounds())) {
-                wall.hit();  // Destruir el muro destructible
+                wall.impacto();  // Destruir el muro destructible
                 bullet.isActive = false;
                 if (bulletHitSound.getStatus() == sf::Sound::Playing) {
                     bulletHitSound.stop();
                     }
-                bulletHitSound.play();  // Desactivar la bala
+                bulletHitSound.play(); 
                 break;  // Salir del bucle tras manejar la colisión
             }
         }
@@ -330,13 +317,13 @@ void Game::update() {
                 sf::FloatRect bulletBounds = bullet.sprite.getGlobalBounds();
 
                 // Calcular solapamiento en ambos ejes
-                float overlapX = std::min(bulletBounds.left + bulletBounds.width, wallBounds.left + wallBounds.width) 
+                float choqueX = std::min(bulletBounds.left + bulletBounds.width, wallBounds.left + wallBounds.width) 
                                - std::max(bulletBounds.left, wallBounds.left);
-                float overlapY = std::min(bulletBounds.top + bulletBounds.height, wallBounds.top + wallBounds.height) 
+                float choqueY = std::min(bulletBounds.top + bulletBounds.height, wallBounds.top + wallBounds.height) 
                                - std::max(bulletBounds.top, wallBounds.top);
 
                 // Determinar el eje de colisión dominante y hacer rebotar la bala
-                if (overlapX < overlapY) {
+                if (choqueX < choqueY) {
                     bullet.velocity.x = -bullet.velocity.x;  // Rebote horizontal
                 } else {
                     bullet.velocity.y = -bullet.velocity.y;  // Rebote vertical
@@ -356,12 +343,12 @@ void Game::update() {
         }
 
         // Verificar colisiones con los tanques y restar vidas
-        if (bullet.checkCollision(player1->sprite)) {
+        if (bullet.colisionTanque(player1->sprite)) {
             player1->restarVida();
             std::cout << "Jugador 1 ha recibido un impacto, vidas restantes: " << player1->vidas << std::endl;
             bullet.isActive = false;
         }
-        if (bullet.checkCollision(player2->sprite)) {
+        if (bullet.colisionTanque(player2->sprite)) {
             player2->restarVida();
             std::cout << "Jugador 2 ha recibido un impacto, vidas restantes: " << player2->vidas << std::endl;
             bullet.isActive = false;
@@ -374,18 +361,18 @@ void Game::update() {
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& bullet) { return !bullet.isActive; }), bullets.end());
 
     // Recargar balas de cada jugador si es necesario
-    if (reloadClockPlayer1.getElapsedTime().asSeconds() >= reloadTime && player1Bullets < maxBullets) {
-        player1Bullets++;
+    if (reloadClockPlayer1.getElapsedTime().asSeconds() >= recarga && player1Balas < balasMaximas) {
+        player1Balas++;
         reloadClockPlayer1.restart();
     }
-    if (reloadClockPlayer2.getElapsedTime().asSeconds() >= reloadTime && player2Bullets < maxBullets) {
-        player2Bullets++;
+    if (reloadClockPlayer2.getElapsedTime().asSeconds() >= recarga && player2Balas < balasMaximas) {
+        player2Balas++;
         reloadClockPlayer2.restart();
     }
     if (player1->estaDestruido() || player2->estaDestruido()) {
         if (!gameOver) { // Solo ejecutar una vez
             gameOver = true;
-            gameOverClock.restart(); // Reiniciar el reloj para contar los 5 segundos
+            tiempoMostrarGanador.restart(); // Reiniciar el reloj para contar los 5 segundos
 
             // Detener la música de fondo
             backgroundMusic.stop();
@@ -395,18 +382,18 @@ void Game::update() {
 
             // Determinar quién ganó
             if (player1->estaDestruido() && !player2->estaDestruido()) {
-                winnerText.setString("El Jugador 2 Gana");
+                textoGanador.setString("El Jugador 2 Gana");
             } else if (!player1->estaDestruido() && player2->estaDestruido()) {
-                winnerText.setString("El Jugador 1 Gana");
+                textoGanador.setString("El Jugador 1 Gana");
             } else {
-                winnerText.setString("Empate");
+                textoGanador.setString("Empate");
             }
 
             // Centrar el texto en la pantalla
-            sf::FloatRect textRect = winnerText.getLocalBounds();
-            winnerText.setOrigin(textRect.left + textRect.width / 2.0f,
+            sf::FloatRect textRect = textoGanador.getLocalBounds();
+            textoGanador.setOrigin(textRect.left + textRect.width / 2.0f,
                                  textRect.top + textRect.height / 2.0f);
-            winnerText.setPosition(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
+            textoGanador.setPosition(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
         }
     }
 

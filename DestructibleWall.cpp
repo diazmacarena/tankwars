@@ -5,14 +5,14 @@ DestructibleWall::DestructibleWall(float width, float height, float posX, float 
     : Wall(width, height, posX, posY, color), destroyed(false) {}
 
 // Dibuja el muro si no está destruido
-void DestructibleWall::draw(sf::RenderWindow& window) const {
+void DestructibleWall::dibujar(sf::RenderWindow& window) const {
     if (!destroyed) {
         window.draw(shape);
     }
 }
 
 // Marca el muro como destruido al recibir un impacto
-void DestructibleWall::hit() {
+void DestructibleWall::impacto() {
     destroyed = true;
 }
 

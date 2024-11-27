@@ -16,7 +16,7 @@ public:
     TankEscopeta(const std::string& textureFile, float initialX, float initialY);
     
     // Metodo para disparar las balas 
-    void shoot(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
+    void disparar(std::vector<Bullet>& bullets, sf::Clock &shootClock, int &bulletCount,
                const float shootInterval, const float reloadTime, sf::Clock &reloadClock) override; 
     
     // Método para consultar las balas restantes

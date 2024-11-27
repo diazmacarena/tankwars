@@ -21,21 +21,21 @@ public:
     Bullet(const sf::Texture& texture, float startX, float startY, sf::Vector2f direction, Tank* shooter);    // Movimiento de la bala
     
     // Acutaliza la bala
-    void update();
+    void actualizar();
 
     // Dibujar la bala
-    void draw(sf::RenderWindow &window);
+    void dibujar(sf::RenderWindow &window);
 
     // Detectar colisiones con otro tanque, ignorando el tanque que disparó la bala
-    bool checkCollision(const sf::Sprite &target);
+    bool colisionTanque(const sf::Sprite &target);
     // Manejo de colisiones para verificar si un tanque ha tocado un muro
-    void handleWallCollision(const sf::FloatRect &wallBounds);
+    void colisionMuro(const sf::FloatRect &wallBounds);
 
 private:
 
     // Rebote en los muros
-    void reverseX();  // Invertir dirección en X
-    void reverseY();  // Invertir dirección en Y
+    void reboteX();  // Invertir dirección en X
+    void reboteY();  // Invertir dirección en Y
     
 };
 
